@@ -1,0 +1,17 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+    font-family: 'Gelion';
+    src: url('../src/fonts/Gelion/Gelion\ Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Gelion';
+    src: url('../src/fonts/Gelion/Gelion\ Bold.ttf') format('truetype');
+    font-weight: bold;
+    font-style: normal;
+}
