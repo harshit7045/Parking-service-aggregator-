@@ -1,4 +1,28 @@
 import React from "react";
+import Cookies from "js-cookie";
+async function loginUser() {
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+  
+
+  try {
+    const response = await fetch("http://localhost:8000/api/users/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email, password }),
+    });
+     
+    const data = await response.json();
+    console.log("Document Cookies:", response.cookie);
+    console.log(data.token);
+    Cookies.set("token", data.token, { expires: 7}) ;
+    
+  } catch (error) {
+    console.log(error);
+  }
+}
 
 const LoginWithGoogleButton = () => {
   return (
@@ -15,10 +39,14 @@ const LoginWithGoogleButton = () => {
           <div className="w-full p-8 lg:w-1/2">
             <p className="text-xl text-gray-600 text-center">Welcome back!</p>
             <div className="mt-4">
-              <label className="block text-gray-700 text-sm font-bold mb-2">
+              <label
+                className="block text-gray-700 text-sm font-bold mb-2"
+                htmlFor="email"
+              >
                 Email Address
               </label>
               <input
+                id="email"
                 className="text-gray-700 border border-gray-300 rounded py-2 px-4 block w-full focus:outline-2 focus:outline-blue-700"
                 type="email"
                 required
@@ -26,11 +54,15 @@ const LoginWithGoogleButton = () => {
             </div>
             <div className="mt-4 flex flex-col justify-between">
               <div className="flex justify-between">
-                <label className="block text-gray-700 text-sm font-bold mb-2">
+                <label
+                  className="block text-gray-700 text-sm font-bold mb-2"
+                  htmlFor="password"
+                >
                   Password
                 </label>
               </div>
               <input
+                id="password"
                 className="text-gray-700 border border-gray-300 rounded py-2 px-4 block w-full focus:outline-2 focus:outline-blue-700"
                 type="password"
               />
@@ -42,7 +74,10 @@ const LoginWithGoogleButton = () => {
               </a>
             </div>
             <div className="mt-8">
-              <button className="bg-[#b16163] text-white font-bold py-2 px-4 w-full rounded hover:bg-blue-600">
+              <button
+                className="bg-[#b16163] text-white font-bold py-2 px-4 w-full rounded hover:bg-blue-600"
+                onClick={loginUser}
+              >
                 Login
               </button>
             </div>
@@ -71,8 +106,8 @@ const LoginWithGoogleButton = () => {
                     />
                   </svg>
                 </div>
-                <div className="flex w-full justify-center " >
-                  <h1 className="whitespace-nowrap  font-bold">
+                <div className="flex w-full justify-center">
+                  <h1 className="whitespace-nowrap font-bold">
                     Sign in with Google
                   </h1>
                 </div>

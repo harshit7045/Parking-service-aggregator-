@@ -2,7 +2,7 @@ import userModel from "./user.model.js";
 import vehicleModel from "../vehicle/vehicleModel.js";
 import pkg from 'jsonwebtoken';
 const { sign } = pkg;
-import cokkieParser from 'cookie-parser';
+import cookieParser from 'cookie-parser';
 const userController = {
   userRegister: async (req, res) => {
     try {
@@ -35,7 +35,7 @@ const userController = {
     }
   },
   loginUser : async (req,res)=>{
-    //console.log(req.user.user);
+    //console.log(req);
     const {email,password} = req.body;
     const user = await userModel.findOne({email:email});
     if(!user){
@@ -43,13 +43,23 @@ const userController = {
     }else{
       if(user.password == password){
         const token = sign({user:user.email, phoneNumber:user.phoneNumber},process.env.SECRET_KEY ,{expiresIn:"7d"});
-        return res.cookie('tokenjwt', token, { httpOnly: true, secure: true }).status(200).send({message:"Login Success",user:user, token:token})
+        return res.cookie('tokenjwt', token, { httpOnly: false, secure: false, sameSite:'none' }).status(200).send({message:"Login Success",user:user, token:token})
         
       }else{
         return res.status(404).send({message:"Invalid credentials"});
       }
     }
+  },
+  getUser: async (req,res)=>{
+    const email=req.user.user;
+    const user = await userModel.findOne({email:email});
+    if(!user){
+      return res.status(404).send({message:"User not found"});
+    }else{
+      return res.status(200).send({user:user});
+    }
   }
 };
+
 
 export default userController;

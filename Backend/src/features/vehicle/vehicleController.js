@@ -11,10 +11,12 @@ const vehicleController = {
         }
     },
     getAllVehicles: async (req, res) => {
-        const { phoneNumber } = req.body;
+        const { phoneNumber } = req.user;
+        console.log(phoneNumber);
         try {
             const result = await vehicleModel.find({ phoneNumber: req.user.phoneNumber });
             res.status(200).send(result);
+            console.log(result);
         } catch (error) {
             res.status(500).send(error);
         }

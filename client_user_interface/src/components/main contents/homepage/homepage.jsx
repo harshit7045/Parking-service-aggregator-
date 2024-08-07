@@ -17,7 +17,7 @@ const blurredBackgroundStyle = {
   left: 0,
   right: 0,
   bottom: 0,
-  backgroundImage: `url(https://i.pinimg.com/736x/df/51/6e/df516e1c0076e42afa5d2d1f7002ef30.jpg)`,
+  backgroundImage: `url(https://th.bing.com/th/id/OIP.RO_-RWKYnbTxQawo9N12ggAAAA?rs=1&pid=ImgDetMain)`,
   backgroundSize: 'cover',
   backgroundPosition: 'center',
   filter: 'blur(0.2rem)',
