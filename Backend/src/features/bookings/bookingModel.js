@@ -7,7 +7,17 @@ const bookingSchema = new Schema({
     required: true
 
   },
-  parkingLotName: {
+  bookingNumber: {
+    type: String,
+    required: true
+
+  },
+  Lotno: {
+    type: String,
+    required: true
+
+  },
+  name: {
     type: String,
     required: true
   },
@@ -29,11 +39,11 @@ const bookingSchema = new Schema({
       default: false
     },
     startTime: {
-      type: Date,
+      type: String,
       
     },
     endTime: {
-      type: Date,
+      type: String,
       
     },
     date: {
@@ -60,6 +70,6 @@ const bookingSchema = new Schema({
   timestamps: true 
 });
 
-const bookingModel = mongoose.model('Booking', bookingSchema);
+const bookingmodel = mongoose.model('Booking', bookingSchema);
 
-export default bookingModel;
+export default bookingmodel;
