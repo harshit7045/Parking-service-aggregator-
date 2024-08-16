@@ -11,8 +11,8 @@ import UserProfile from "./components/main contents/profile/profile";
 import Bookingform from "./components/main contents/booking/booklotPopup";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
-const parkingLotName = "Pankaj parking lot";  // Replace with your actual values
-const pincode = "12345";  // Replace with your actual values
+const parkingLotName = "Pankaj parking lot"; 
+const pincode = "12345"; 
 
 root.render(
   <React.StrictMode>
@@ -25,8 +25,8 @@ root.render(
           <Route path="booklot" element={<ParkingLot />} />
           <Route path="profile" element={<UserProfile />} />
           <Route
-            path="booklotform"
-            element={<Bookingform parkingLotName={parkingLotName} pincode={pincode} />}
+            path="booklot/selectvehicle"
+            element={<Bookingform  />}
           />
         </Route>
       </Routes>

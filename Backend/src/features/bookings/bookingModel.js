@@ -12,8 +12,18 @@ const bookingSchema = new Schema({
     required: true
 
   },
+  model: {
+    type: String,
+    required: true
+
+  },
   Lotno: {
     type: String,
+    required: true
+
+  },
+  vehicleIn: {
+    type: Boolean,
     required: true
 
   },
@@ -63,6 +73,12 @@ const bookingSchema = new Schema({
     },
     endDate: {
       type: Date,
+      
+    }
+  },
+  iotBooking: {
+    startTime: {
+      type: String,
       
     }
   }

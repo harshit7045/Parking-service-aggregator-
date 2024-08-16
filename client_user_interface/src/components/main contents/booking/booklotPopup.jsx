@@ -7,6 +7,7 @@ import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Typography }
 import CarImgMediaCard from "./booklotVehiclecard";
 import Cookies from 'js-cookie';
 import {BasicDatePicker, hoursdate} from "./singledatePicker";
+import { useLocation } from 'react-router-dom';
 const textStyle = {
   color: '#030303',
   fontSize: '30px',
@@ -61,12 +62,14 @@ const UserProfile = ({ dat }) => {
   );
 };
 
-export default function Bookingform({ parkingLotName, pincode }) {
+export default function Bookingform() {
+  const location = useLocation();
+  const { parkingLotName, pincode } = location.state || {};
   const [bookingType, setBookingType] = useState("date"); // 'date' or 'time'
   const [dialogOpen, setDialogOpen] = useState(false);
 
   const [dat, setDat] = useState({
-    parkingLotName: parkingLotName,
+    name: parkingLotName,
     pincode: pincode,
     vehicleUid: "",
     bookingModel: { model: "date", date: dateData }

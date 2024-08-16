@@ -58,7 +58,18 @@ const userController = {
     }else{
       return res.status(200).send({user:user});
     }
-  }
+  },
+  getUserByVehicleUid: async (req, res) => {
+    const { uid } = req.body;
+    const user = await userModel.findOne({ uniqueIdentification: uid });
+    
+    if (!user) {
+      return res.status(404).send({ message: "User not found" });
+    } else {
+      
+      return res.status(200).send({ user: user });
+    }
+  },
 };
 
 

@@ -1,14 +1,16 @@
 import React, { useState } from 'react';
 import Cookies from 'js-cookie'; 
+import { useNavigate } from 'react-router-dom';
 
 function ParkingLot() {
   const [parkingLots, setParkingLots] = useState([]);
   const [pincode, setPincode] = useState("");
   const [email, setEmail] = useState("");
+  const navigate = useNavigate(); // Use the useNavigate hook
 
   const handleSearch = async () => {
     try {
-      const responseUser = await fetch(`http://localhost:8000/api/parking/getlots`, {
+      const responseUser = await fetch(`http://localhost:8000/api/parking/getlots?pincode=${pincode}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -27,6 +29,10 @@ function ParkingLot() {
     }
   };
 
+  const handleBookNow = (lot) => {
+    navigate('/booklot/selectvehicle', { state: { parkingLotName: lot.name, pincode: lot.pincode } });
+  };
+
   return (
     <div className="container mx-auto p-6">
       <h1 className="text-2xl font-bold mb-6">Book Parking Lot</h1>
@@ -40,23 +46,20 @@ function ParkingLot() {
         />
         <button onClick={handleSearch} className="border rounded px-4 py-2 bg-gray-200">Search</button>
       </div>
-      <div className="mb-4">
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className="border rounded px-4 py-2 w-full"
-        />
+      <div className="mb-4 ">
+        
       </div>
-      <h2 className="text-xl font-semibold mb-4">Available Parking Lots</h2>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <h2 className="text-xl font-semibold   " >Available Parking Lots</h2>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-[40vh]" >
         {parkingLots.map((lot, index) => (
           <div key={index} className="border rounded p-4">
             <p className="font-semibold">{lot.address}</p>
             <p>Name: {lot.name}</p>
             <p>Pincode: {lot.pincode}</p>
-            <button className="mt-4 w-full bg-red-500 text-white py-2 rounded">
+            <button
+              className="mt-4 w-full bg-red-500 text-white py-2 rounded"
+              onClick={() => handleBookNow(lot)}
+            >
               Book Now
             </button>
           </div>

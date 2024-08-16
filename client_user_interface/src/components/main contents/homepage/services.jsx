@@ -4,7 +4,7 @@ export default function Services() {
       <>
        <div className="  " >
         <div className="headf m-[5vh]"> 
-            Popular Parking Lots
+            Benefits of using our Services
         </div >
        <div className="flex flex-wrap justify-center">
        <ImgMediaCard title="Fast Tag Billing" description="Direct fast tag billing without maual intervention" image="https://bolsterfizz.com/wp-content/uploads/2020/01/images.jpg"/>

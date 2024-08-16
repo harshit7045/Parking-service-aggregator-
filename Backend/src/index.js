@@ -11,6 +11,7 @@ const port = process.env.PORT || 7000;
 import vehicleRouter from "./features/vehicle/vehicleRouter.js";
 import parkingRouter from "./features/parking_lots/parkingRouter.js";
 import bookingRouter from "./features/bookings/bookingRouter.js";
+import iotRouter from "./features/iotbookings/iotRouter.js";
 connectDB()
   .then(() => {
     console.log("MongoDB Connected");
@@ -27,4 +28,5 @@ app.listen(port, () => {
 app.use("/api/users", userRouter);
 app.use("/api/vehicles", vehicleRouter);
 app.use("/api/parking", parkingRouter);
-app.use("/api/bookings",bookingRouter)
+app.use("/api/bookings",bookingRouter);
+app.use("/api/iot",iotRouter);

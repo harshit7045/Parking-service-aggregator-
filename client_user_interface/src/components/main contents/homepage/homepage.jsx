@@ -83,7 +83,7 @@ export default function Homepage() {
         <div style={inputContainerStyle}>
           <input
             type="text"
-            placeholder="Enter pin code and email"
+            placeholder="Enter your email to join"
             style={inputStyle}
             className="w-[50vw]"
           />

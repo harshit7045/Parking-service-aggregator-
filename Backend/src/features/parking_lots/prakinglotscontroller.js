@@ -23,15 +23,14 @@ const parkingLotsController = {
       const pincode = req.query.pincode;
 
       console.log(`Searching for parking lot: ${pincode}`);
-      
+
       let data = await ParkingLotModel.find({ pincode });
-        console.log(data);
+      console.log(data);
       if (!data) {
         console.log("Parking lot not found");
         return res.status(404).send("Parking lot not found");
       }
       res.status(200).send(data);
-      
     } catch (error) {
       console.error("Error during fetching parking lots:", error);
       res.status(500).send("Server error");
@@ -39,8 +38,11 @@ const parkingLotsController = {
   },
 
   makeBookingOnlineDateWise: async (req, res) => {
-    const { name, pincode, vehicleUid, startDate, endDate ,bookingNumber} = req.body;
-    console.log(`Booking request received for ${name}, ${pincode}, vehicle: ${vehicleUid}, from ${startDate} to ${endDate}`);
+    const { name, pincode, vehicleUid, startDate, endDate, bookingNumber } =
+      req.body;
+    console.log(
+      `Booking request received for ${name}, ${pincode}, vehicle: ${vehicleUid}, from ${startDate} to ${endDate}`
+    );
 
     try {
       let data = await ParkingLotModel.findOne({ name, pincode });
@@ -57,7 +59,9 @@ const parkingLotsController = {
         const lot = data.lots[i];
 
         if (lot.iotbooking) {
-          console.log(`Lot ${lot.lotNo} is reserved for IoT bookings. Skipping.`);
+          console.log(
+            `Lot ${lot.lotNo} is reserved for IoT bookings. Skipping.`
+          );
           continue;
         }
 
@@ -86,7 +90,7 @@ const parkingLotsController = {
           date: startDate,
           vehicleUid,
           endTime: endDate,
-          bookingNumber:bookingNumber
+          bookingNumber: bookingNumber,
         });
 
         lotFound = true;
@@ -97,7 +101,9 @@ const parkingLotsController = {
 
       if (!lotFound) {
         console.log("No available lots found.");
-        return res.status(409).send("No available lots for the specified time.");
+        return res
+          .status(409)
+          .send("No available lots for the specified time.");
       }
 
       data.markModified("lots");
@@ -117,7 +123,9 @@ const parkingLotsController = {
 
   makeBookingOnlineHourWise: async (req, res) => {
     const { name, pincode, date, start, end, bookingNumber } = req.body;
-    console.log(`Hour-wise booking request received for ${name}, ${pincode}, date: ${date}, from ${start}:00 to ${end}:00`);
+    console.log(
+      `Hour-wise booking request received for ${name}, ${pincode}, date: ${date}, from ${start}:00 to ${end}:00`
+    );
 
     try {
       let data = await ParkingLotModel.findOne({ name, pincode });
@@ -134,7 +142,9 @@ const parkingLotsController = {
         const lot = data.lots[i];
 
         if (lot.iotbooking) {
-          console.log(`Lot ${lot.lotNo} is reserved for IoT bookings. Skipping.`);
+          console.log(
+            `Lot ${lot.lotNo} is reserved for IoT bookings. Skipping.`
+          );
           continue;
         }
 
@@ -156,8 +166,14 @@ const parkingLotsController = {
           for (let z = start; z <= end; z++) {
             time[z] = true;
           }
-          lot.bookingsHourWise.push({ date, time, bookingNumber:bookingNumber });
-          console.log(`No previous hour bookings found for date ${date}. Creating new time slots.`);
+          lot.bookingsHourWise.push({
+            date,
+            time,
+            bookingNumber: bookingNumber,
+          });
+          console.log(
+            `No previous hour bookings found for date ${date}. Creating new time slots.`
+          );
         } else {
           let time = lot.bookingsHourWise[hourwiseBookingFlag].time;
           let conflict = false;
@@ -170,7 +186,9 @@ const parkingLotsController = {
           }
 
           if (conflict) {
-            console.log(`Hourwise clash detected within the time slots ${start}:00 to ${end}:00 for lot ${lot.lotNo}.`);
+            console.log(
+              `Hourwise clash detected within the time slots ${start}:00 to ${end}:00 for lot ${lot.lotNo}.`
+            );
             continue;
           }
 
@@ -188,7 +206,9 @@ const parkingLotsController = {
 
       if (!lotFound) {
         console.log("No available lots found.");
-        return res.status(409).send("No available lots for the specified time.");
+        return res
+          .status(409)
+          .send("No available lots for the specified time.");
       }
 
       data.markModified("lots");
@@ -205,10 +225,122 @@ const parkingLotsController = {
       res.status(500).send("Server error");
     }
   },
+  makeBookingFromIot: async (req, res) => {
+    const { name, pincode, bookingNumber } = req.body;
+
+    try {
+      // Find the parking lot
+      const lot = await ParkingLotModel.findOne({ name, pincode });
+
+      if (!lot) {
+        console.log("Parking lot not found");
+        return res.status(404).send("Parking lot not found");
+      }
+
+      let lotFound = false;
+
+      // Iterate through the lots
+      for (let i = 0; i < lot.lots.length; i++) {
+        const currentLot = lot.lots[i];
+
+        // Check if the lot is reserved for IoT bookings and is not already occupied
+        if (currentLot.iotbooking && !currentLot.occupied) {
+          // Mark the lot as occupied and add the booking details
+          currentLot.occupied = true;
+          currentLot.bookings.push({
+            bookingNumber: bookingNumber,
+            startTime: new Date().toISOString(),
+          });
+
+          lotFound = true;
+          console.log(`IoT booking successful for lot ${currentLot.lotNo}.`);
+          break;
+        }
+      }
+
+      if (!lotFound) {
+        console.log(
+          "No available IoT lots found or all IoT lots are occupied."
+        );
+        return res
+          .status(409)
+          .send("No available IoT lots or all IoT lots are occupied.");
+      }
+
+      // Mark the document as modified and save the changes
+      lot.markModified("lots");
+      await lot.save();
+      return lot.lotNo;
+      console.log("IoT booking data successfully saved.");
+      res.status(200).send({
+        message: "IoT booking successful",
+      });
+    } catch (error) {
+      console.error("Error during IoT booking:", error);
+      res.status(500).send("Server error");
+    }
+  },
+
+  makeBookingFromIotOnPlace: async (req, res) => {
+    const { name, pincode, bookingNumber } = req.body;
+
+    try {
+      const lot = await ParkingLotModel.findOne({ name, pincode });
+
+      if (!lot) {
+        console.log("Parking lot not found");
+        return res.status(404).send("Parking lot not found");
+      }
+
+      let lotNo = 0;
+
+      for (let i = 0; i < lot.lots.length; i++) {
+        const currentLot = lot.lots[i];
+
+        if (currentLot.iotbooking && !currentLot.occupied) {
+          lotNo = currentLot.lotNo;
+          currentLot.occupied = true;
+          currentLot.bookings.push({
+            bookingNumber: bookingNumber,
+            startTime: new Date().toISOString(),
+          });
+
+          // Mark the 'lots' array as modified
+          lot.markModified("lots");
+
+          // Save the lot status
+          await lot.save();
+          console.log("Data successfully saved.");
+          console.log("IoT booking successful, lot number:", lotNo);
+          return lotNo;
+          return res.status(200).send({
+            message: "IoT booking successful",
+            lotNo: lotNo,
+          });
+
+          break;
+        }
+      }
+
+      if (lotNo === 0) {
+        console.log(
+          "No available IoT lots found or all IoT lots are occupied."
+        );
+        return res
+          .status(409)
+          .send("No available IoT lots or all IoT lots are occupied.");
+      }
+    } catch (error) {
+      console.error("Error during IoT booking:", error);
+      return res.status(500).send("Server error");
+    }
+  },
 
   registerParkingLot: async (req, res) => {
     const { phoneNumber, name, maxCapacity, occupancy, pincode } = req.body;
-    console.log(`Registering parking lot: ${name}, ${pincode}, max capacity: ${maxCapacity}`);
+    console.log(
+      `Registering parking lot: ${name}, ${pincode}, max capacity: ${maxCapacity}`
+    );
 
     let space = [];
     for (let i = 0; i < maxCapacity; i++) {
@@ -249,6 +381,65 @@ const parkingLotsController = {
       res.status(500).send(error);
     }
   },
+  removeBookingFromIot: async (req, res) => {
+    const { name, pincode, bookingNumber, lotNo, model } = req.body;
+
+    try {
+        const lot = await ParkingLotModel.findOne({ name, pincode });
+        if (!lot) {
+            console.log("Parking lot not found");
+            return res.status(404).send("Parking lot not found");
+        }
+
+        let bookedLot = lot.lots.find((lot) => lot.lotNo === lotNo);
+        if (!bookedLot) {
+            console.log("Lot not found");
+            return res.status(404).send("Lot not found");
+        }
+
+        if (model === "iot") {
+            let index = bookedLot.iotbooking.findIndex(booking => booking.bookingNumber === bookingNumber);
+            if (index !== -1) {
+                bookedLot.iotbooking.splice(index, 1);
+            } else {
+                console.log("Booking not found in IoT bookings");
+                return res.status(404).send("Booking not found in IoT bookings");
+            }
+        } else if (model === "datewise") {
+            let index = bookedLot.bookingsDateWise.findIndex(booking => booking.bookingNumber === bookingNumber);
+            if (index !== -1) {
+                bookedLot.bookingsDateWise.splice(index, 1);
+            } else {
+                console.log("Booking not found in datewise bookings");
+                return res.status(404).send("Booking not found in datewise bookings");
+            }
+        } else if (model === "hourwise") {
+            let index = bookedLot.bookingsHourWise.findIndex(booking => booking.bookingNumber === bookingNumber);
+            if (index !== -1) {
+                bookedLot.bookingsHourWise.splice(index, 1);
+            } else {
+                console.log("Booking not found in hourwise bookings");
+                return res.status(404).send("Booking not found in hourwise bookings");
+            }
+        } else {
+            console.log("Invalid model type");
+            return res.status(400).send("Invalid model type");
+        }
+
+        
+        if (bookedLot.bookingsDateWise.length === 0 && bookedLot.bookingsHourWise.length === 0 && bookedLot.iotbooking.length === 0) {
+            bookedLot.occupied = false;
+        }
+
+        await lot.save();
+        console.log("Booking removed successfully");
+        res.status(200).send("Booking removed successfully");
+
+    } catch (error) {
+        console.error("Error removing booking:", error);
+        res.status(500).send("Server error");
+    }
+},
 };
 
 export default parkingLotsController;

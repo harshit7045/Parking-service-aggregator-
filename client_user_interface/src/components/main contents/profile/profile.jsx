@@ -167,7 +167,7 @@ const UserProfile = () => {
   return (
     <div style={{ padding: '20px' }}>
       <ProfileCard profile={profile} />
-      <Typography variant="h6" style={{ marginBottom: '10px' }}>Vehicles</Typography>
+      <Typography variant="h6" style={{ marginBottom: '10px' }}>Choose your vehicle for the booking</Typography>
       <Grid container spacing={2}>
         {vehicles.length > 0 ? vehicles.map((vehicle, index) => (
           <Grid item key={index}>
@@ -175,7 +175,7 @@ const UserProfile = () => {
           </Grid>
         )) : <Typography>No vehicles available.</Typography>}
       </Grid>
-      <Typography variant="h6" style={{ marginBottom: '10px', marginTop: '20px' }}>Bookings</Typography>
+      <Typography variant="h6" style={{ marginBottom: '10px', marginTop: '20px' }}>Your Upcomeing Bookings</Typography>
       <Grid container spacing={2}>
         {(profile.bookings || []).map((booking, index) => (
           <Grid item xs={12} key={index}>
