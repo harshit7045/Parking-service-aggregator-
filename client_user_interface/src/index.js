@@ -10,7 +10,7 @@ import ParkingLot from "./components/main contents/booking/booklot";
 import UserProfile from "./components/main contents/profile/profile";
 import Bookingform from "./components/main contents/booking/booklotPopup";
 import { CheckoutForm, Return } from "./components/main contents/profile/stripe";
-
+import MapWithSearch from "./components/main contents/booking/map";
 const root = ReactDOM.createRoot(document.getElementById("root"));
 const parkingLotName = "Pankaj parking lot"; 
 const pincode = "12345"; 
@@ -27,6 +27,7 @@ root.render(
           <Route path="profile" element={<UserProfile />} />
           <Route path="checkout" element={<CheckoutForm />} />
           <Route path="return" element={<Return />} />
+          <Route path="map" element={<MapWithSearch initialLocation={228001} />} />
           <Route
             path="booklot/selectvehicle"
             element={<Bookingform  />}
