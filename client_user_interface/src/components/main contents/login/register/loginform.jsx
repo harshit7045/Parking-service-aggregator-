@@ -1,5 +1,6 @@
 import React from "react";
 import Cookies from "js-cookie";
+import { useNavigate } from "react-router-dom";
 async function loginUser() {
   const email = document.getElementById("email").value;
   const password = document.getElementById("password").value;
@@ -25,6 +26,10 @@ async function loginUser() {
 }
 
 const LoginWithGoogleButton = () => {
+  const navigate = useNavigate();
+  const handleClick = () => {
+    navigate("/register");
+};
   return (
     <div className="relative flex items-center justify-center h-screen w-full">
       <div className="absolute inset-0 bg-black opacity-50 backdrop-blur-sm"></div>
@@ -119,7 +124,7 @@ const LoginWithGoogleButton = () => {
                 className="text-xs text-gray-500 capitalize text-center w-full"
               >
                 Don&apos;t have any account yet?
-                <span className="text-blue-700"> Sign Up</span>
+                <span className="text-blue-700" onClick={handleClick}> Sign Up</span>
               </a>
             </div>
           </div>

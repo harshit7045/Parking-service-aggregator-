@@ -9,6 +9,7 @@ import RegistrationForm from "./components/main contents/login/register/register
 import ParkingLot from "./components/main contents/booking/booklot";
 import UserProfile from "./components/main contents/profile/profile";
 import Bookingform from "./components/main contents/booking/booklotPopup";
+import { CheckoutForm, Return } from "./components/main contents/profile/stripe";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 const parkingLotName = "Pankaj parking lot"; 
@@ -24,6 +25,8 @@ root.render(
           <Route path="register" element={<RegistrationForm />} />
           <Route path="booklot" element={<ParkingLot />} />
           <Route path="profile" element={<UserProfile />} />
+          <Route path="checkout" element={<CheckoutForm />} />
+          <Route path="return" element={<Return />} />
           <Route
             path="booklot/selectvehicle"
             element={<Bookingform  />}

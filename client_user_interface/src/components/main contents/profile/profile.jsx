@@ -1,22 +1,35 @@
-import React, { useEffect, useState } from 'react';
-import { Card, CardContent, Typography, Grid, Button, TextField, MenuItem } from '@mui/material';
-import ImgMediaCard from '../homepage/card'; // Ensure this path is correct
-import Cookies from 'js-cookie';
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import {
+  Card,
+  CardContent,
+  Typography,
+  Grid,
+  Button,
+  TextField,
+  MenuItem,
+} from "@mui/material";
+import ImgMediaCard from "../homepage/card"; // Ensure this path is correct
+import Cookies from "js-cookie";
 
+// Function to fetch user profile and vehicles
 async function getUserProfile() {
   let user = {
     vehicle: [],
-    userDetails: {}
+    userDetails: {},
   };
 
   try {
-    const responseVehicles = await fetch("http://localhost:8000/api/vehicles/getvehicles", {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        "authorization": Cookies.get("token"),
-      },
-    });
+    const responseVehicles = await fetch(
+      "http://localhost:8000/api/vehicles/getvehicles",
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          authorization: Cookies.get("token"),
+        },
+      }
+    );
 
     if (!responseVehicles.ok) {
       throw new Error(`HTTP error! status: ${responseVehicles.status}`);
@@ -25,18 +38,21 @@ async function getUserProfile() {
     const vehicleData = await responseVehicles.json();
     user.vehicle = vehicleData;
   } catch (error) {
-    console.log('Error fetching vehicles:', error);
+    console.log("Error fetching vehicles:", error);
     return null;
   }
 
   try {
-    const responseUser = await fetch("http://localhost:8000/api/users/getuser", {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        "authorization": Cookies.get("token"),
-      },
-    });
+    const responseUser = await fetch(
+      "http://localhost:8000/api/users/getuser",
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          authorization: Cookies.get("token"),
+        },
+      }
+    );
 
     if (!responseUser.ok) {
       throw new Error(`HTTP error! status: ${responseUser.status}`);
@@ -45,7 +61,7 @@ async function getUserProfile() {
     const userData = await responseUser.json();
     user.userDetails = userData.user;
   } catch (error) {
-    console.log('Error fetching user profile:', error);
+    console.log("Error fetching user profile:", error);
     return null;
   }
 
@@ -53,19 +69,25 @@ async function getUserProfile() {
   return user;
 }
 
+let balance = 0;
+
+
 const ProfileCard = ({ profile }) => (
-  <Card style={{ marginBottom: '20px' }}>
+  <Card style={{ marginBottom: "20px" }}>
     <CardContent>
       <Typography variant="h6">Profile Details: {profile.name}</Typography>
       <Typography>Phone Number: {profile.phoneNumber}</Typography>
       <Typography>Email: {profile.email}</Typography>
-      <Typography>Wallet Balance: ${profile.walletBalance ? profile.walletBalance.toFixed(2) : '0.00'}</Typography>
+      <Typography>
+        Wallet Balance: $
+        {profile.walletBalance ? profile.walletBalance.toFixed(2) : "0.00"}
+      </Typography>
     </CardContent>
   </Card>
 );
 
 const VehicleCard = ({ vehicle }) => (
-  <div style={{ display: 'flex', flexDirection: 'row' }}>
+  <div style={{ display: "flex", flexDirection: "row" }}>
     <ImgMediaCard
       title={vehicle.uniqueIdentification}
       description={vehicle.category}
@@ -75,7 +97,7 @@ const VehicleCard = ({ vehicle }) => (
 );
 
 const BookingCard = ({ booking }) => (
-  <Card style={{ marginBottom: '20px' }}>
+  <Card style={{ marginBottom: "20px" }}>
     <CardContent>
       <Typography>Booking ID: {booking.id}</Typography>
       <Typography>Date: {booking.date}</Typography>
@@ -84,8 +106,14 @@ const BookingCard = ({ booking }) => (
   </Card>
 );
 
-const AddMoneyForm = ({ amount, setAmount, paymentMethod, setPaymentMethod, handlePayment }) => (
-  <Card style={{ marginTop: '20px' }}>
+const AddMoneyForm = ({
+  amount,
+  setAmount,
+  paymentMethod,
+  setPaymentMethod,
+  handlePayment,
+}) => (
+  <Card style={{ marginTop: "20px" }}>
     <CardContent>
       <Typography variant="h6">Add Money to Wallet</Typography>
       <Grid container spacing={2}>
@@ -115,7 +143,7 @@ const AddMoneyForm = ({ amount, setAmount, paymentMethod, setPaymentMethod, hand
       <Button
         variant="contained"
         color="primary"
-        style={{ marginTop: '20px' }}
+        style={{ marginTop: "20px" }}
         onClick={handlePayment}
       >
         Proceed to Payment
@@ -129,18 +157,19 @@ const UserProfile = () => {
   const [vehicles, setVehicles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [amount, setAmount] = useState('');
-  const [paymentMethod, setPaymentMethod] = useState('Credit Card');
+  const [amount, setAmount] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState("Credit Card");
+  const navigate = useNavigate(); // Correct use of useNavigate
 
   useEffect(() => {
     async function fetchData() {
       const userProfile = await getUserProfile();
-      console.log('Fetched profile:', userProfile);
+      console.log("Fetched profile:", userProfile);
       if (userProfile) {
         setProfile(userProfile.userDetails);
         setVehicles(userProfile.vehicle || []);
       } else {
-        setError('Failed to fetch user profile.');
+        setError("Failed to fetch user profile.");
       }
       setLoading(false);
     }
@@ -148,8 +177,9 @@ const UserProfile = () => {
   }, []);
 
   const handlePayment = () => {
-    // Handle payment logic here
-    alert(`Adding $${amount} to wallet via ${paymentMethod}`);
+    console.log("Amount:", amount);
+    //alert(`Adding $${amount} to wallet via ${paymentMethod}`);
+    navigate('/checkout', { state: { amount: parseInt(amount) } }); // Navigate to checkout
   };
 
   if (loading) {
@@ -165,17 +195,28 @@ const UserProfile = () => {
   }
 
   return (
-    <div style={{ padding: '20px' }}>
+    <div style={{ padding: "20px" }}>
       <ProfileCard profile={profile} />
-      <Typography variant="h6" style={{ marginBottom: '10px' }}>Choose your vehicle for the booking</Typography>
+      <Typography variant="h6" style={{ marginBottom: "10px" }}>
+        Choose your vehicle for the booking
+      </Typography>
       <Grid container spacing={2}>
-        {vehicles.length > 0 ? vehicles.map((vehicle, index) => (
-          <Grid item key={index}>
-            <VehicleCard vehicle={vehicle} />
-          </Grid>
-        )) : <Typography>No vehicles available.</Typography>}
+        {vehicles.length > 0 ? (
+          vehicles.map((vehicle, index) => (
+            <Grid item key={index}>
+              <VehicleCard vehicle={vehicle} />
+            </Grid>
+          ))
+        ) : (
+          <Typography>No vehicles available.</Typography>
+        )}
       </Grid>
-      <Typography variant="h6" style={{ marginBottom: '10px', marginTop: '20px' }}>Your Upcomeing Bookings</Typography>
+      <Typography
+        variant="h6"
+        style={{ marginBottom: "10px", marginTop: "20px" }}
+      >
+        Your Upcoming Bookings
+      </Typography>
       <Grid container spacing={2}>
         {(profile.bookings || []).map((booking, index) => (
           <Grid item xs={12} key={index}>

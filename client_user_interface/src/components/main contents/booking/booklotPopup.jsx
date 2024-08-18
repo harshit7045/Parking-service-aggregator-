@@ -8,6 +8,7 @@ import CarImgMediaCard from "./booklotVehiclecard";
 import Cookies from 'js-cookie';
 import {BasicDatePicker, hoursdate} from "./singledatePicker";
 import { useLocation } from 'react-router-dom';
+import SimpleAlert from "../homepage/alertbox";
 const textStyle = {
   color: '#030303',
   fontSize: '30px',

@@ -382,7 +382,8 @@ const parkingLotsController = {
     }
   },
   removeBookingFromIot: async (req, res) => {
-    const { name, pincode, bookingNumber, lotNo, model } = req.body;
+    console.log(req.body);
+    const { name, pincode, bookingNumber, Lotno, model } = req.body;
 
     try {
         const lot = await ParkingLotModel.findOne({ name, pincode });
@@ -391,22 +392,25 @@ const parkingLotsController = {
             return res.status(404).send("Parking lot not found");
         }
 
-        let bookedLot = lot.lots.find((lot) => lot.lotNo === lotNo);
+        console.log(`Removing booking from Lotno: ${Lotno}`);
+        let bookedLot = lot.lots.find(lot => lot.lotNo == Lotno);
+
         if (!bookedLot) {
             console.log("Lot not found");
             return res.status(404).send("Lot not found");
         }
 
+        let index;
         if (model === "iot") {
-            let index = bookedLot.iotbooking.findIndex(booking => booking.bookingNumber === bookingNumber);
+            index = bookedLot.bookings.findIndex(booking => booking.bookingNumber === bookingNumber);
             if (index !== -1) {
-                bookedLot.iotbooking.splice(index, 1);
+                bookedLot.bookings.splice(index, 1);
             } else {
                 console.log("Booking not found in IoT bookings");
                 return res.status(404).send("Booking not found in IoT bookings");
             }
         } else if (model === "datewise") {
-            let index = bookedLot.bookingsDateWise.findIndex(booking => booking.bookingNumber === bookingNumber);
+            index = bookedLot.bookingsDateWise.findIndex(booking => booking.bookingNumber === bookingNumber);
             if (index !== -1) {
                 bookedLot.bookingsDateWise.splice(index, 1);
             } else {
@@ -414,7 +418,7 @@ const parkingLotsController = {
                 return res.status(404).send("Booking not found in datewise bookings");
             }
         } else if (model === "hourwise") {
-            let index = bookedLot.bookingsHourWise.findIndex(booking => booking.bookingNumber === bookingNumber);
+            index = bookedLot.bookingsHourWise.findIndex(booking => booking.bookingNumber === bookingNumber);
             if (index !== -1) {
                 bookedLot.bookingsHourWise.splice(index, 1);
             } else {
@@ -426,20 +430,26 @@ const parkingLotsController = {
             return res.status(400).send("Invalid model type");
         }
 
-        
-        if (bookedLot.bookingsDateWise.length === 0 && bookedLot.bookingsHourWise.length === 0 && bookedLot.iotbooking.length === 0) {
+        // Update the 'occupied' status based on the model and remaining bookings
+        if (model === "iot" && bookedLot.bookings.length === 0) {
+            bookedLot.occupied = false;
+        } else if (bookedLot.bookingsDateWise.length === 0 && bookedLot.bookingsHourWise.length === 0) {
             bookedLot.occupied = false;
         }
 
+        // Mark the modified subdocument
+        lot.markModified('lots');
+
         await lot.save();
         console.log("Booking removed successfully");
-        res.status(200).send("Booking removed successfully");
+        return res.status(200).send("Booking removed successfully");
 
     } catch (error) {
         console.error("Error removing booking:", error);
-        res.status(500).send("Server error");
+        return res.status(500).send("Server error");
     }
 },
+
 };
 
 export default parkingLotsController;

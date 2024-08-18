@@ -205,33 +205,46 @@ const bookingController = {
 
   deleteBooking: async (req, res) => {
     const bookingNumber = req.body.id;
+
     try {
-      const result = await bookingmodel.findOneAndDelete({
-        bookingNumber: bookingNumber,
-      });
+        let billingDetails = {
+            body: {
+                bookingNumber: bookingNumber
+            }
+        };
+        const x={
+          body:await bookingmodel.findOne({bookingNumber: bookingNumber})
+        };
+        console.log(x);
+        let bill = await bookingController.createBillOfBooking(billingDetails, res);
+        await parkingLotsController.removeBookingFromIot(x, res);
+        const result = await bookingmodel.findOneAndDelete({
+            bookingNumber: bookingNumber,
+            
+        });
 
-      if (!result && !res.headersSent) {
-        return res.status(404).send("Booking not found");
-      }
-      console.log("Booking deleted successfully");
-      if (!res.headersSent) {
-        return res.status(200).send("Booking deleted successfully");
-      }
+        if (!result) {
+            console.log("Booking not found");
+            return res.status(404).send("Booking not found");
+        }
+
+        console.log("Booking deleted successfully");
+        return res.status(200).json({ message: "Booking deleted successfully", bill: bill.bill });
+
     } catch (error) {
-      console.error("Error deleting booking:", error);
-      if (!res.headersSent) {
-        return res
-          .status(500)
-          .send("An error occurred while deleting the booking");
-      }
+        console.error("Error deleting booking:", error);
+        return res.status(500).send("An error occurred while deleting the booking");
     }
-  },
+},
   createBillOfBooking: async(req, res) => {
-    let booking = req.body;
+    let bookingNo = req.body.bookingNumber;
     let bill = 0;
-    let ratePerHour = 1;
+    let ratePerHour = 1000000000000;
     let currentTime = new Date();
-
+    let booking= await bookingmodel.findOne({
+      bookingNumber:bookingNo
+    });
+    console.log(booking);
     if (booking.model === "iot") {
         bill = (currentTime - new Date(booking.iotBooking.startTime)) / (1000 * 60 * 60) * ratePerHour;
     }
@@ -264,8 +277,8 @@ const bookingController = {
         }
     }
 
-  
-    res.json({ bill: bill, booking: booking });
+    console.log("Bill: ", bill);
+    return bill;
 }
 }
 ;

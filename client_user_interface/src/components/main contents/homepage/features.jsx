@@ -1,6 +1,11 @@
 import React from "react";
 import "@fontsource/poppins";
 import car from "../../../assets/images/car-svgrepo-com (1).svg";
+import tree from "../../../assets/images/tree-svgrepo-com.svg";
+import building from "../../../assets/images/building-flag-svgrepo-com.svg";
+import ticket from "../../../assets/images/ticket2-svgrepo-com.svg";
+import valet from "../../../assets/images/valet-head-svgrepo-com.svg";
+import online from "../../../assets/images/online-test-svgrepo-com.svg";
 
 export default function Features() {
   return (
@@ -15,67 +20,67 @@ export default function Features() {
             />
           </div>
           <div className="login justify-center flex items-center  w-[70%] p-[1vw] ">
-            text
+            Indoor
           </div>
         </div>
         <div className="min-w-[20vw] h-[9vh] bg-[#ffffff] border-dotted border-1 border-[#030303] m-[2.5vw] rounded-[10px] flex flex-wrap">
           <div className="w-[20%] m-[3%] h-[80%]">
             <img
-              src={car}
+              src={building}
               alt="Car"
               style={{ width: "100%", height: "100%" }}
             />
           </div>
           <div className="login justify-center flex items-center  w-[70%] p-[1vw] ">
-            text
+            Outdoor
           </div>
         </div>
         <div className="min-w-[20vw] h-[9vh] bg-[#ffffff] border-dotted border-1 border-[#030303] m-[2.5vw] rounded-[10px] flex flex-wrap">
           <div className="w-[20%] m-[3%] h-[80%]">
             <img
-              src={car}
+              src={online}
               alt="Car"
               style={{ width: "100%", height: "100%" }}
             />
           </div>
           <div className="login justify-center flex items-center  w-[70%] p-[1vw] ">
-            text
+            Online Booking
           </div>
         </div>
         <div className="min-w-[20vw] h-[9vh] bg-[#ffffff] border-dotted border-1 border-[#030303] m-[2.5vw] rounded-[10px] flex flex-wrap">
           <div className="w-[20%] m-[3%] h-[80%]">
             <img
-              src={car}
+              src={tree}
               alt="Car"
               style={{ width: "100%", height: "100%" }}
             />
           </div>
           <div className="login justify-center flex items-center  w-[70%] p-[1vw] ">
-            text
+            Street
           </div>
         </div>
         <div className="min-w-[20vw] h-[9vh] bg-[#ffffff] border-dotted border-1 border-[#030303] m-[2.5vw] rounded-[10px] flex flex-wrap">
           <div className="w-[20%] m-[3%] h-[80%]">
             <img
-              src={car}
+              src={valet}
               alt="Car"
               style={{ width: "100%", height: "100%" }}
             />
           </div>
           <div className="login justify-center flex items-center  w-[70%] p-[1vw] ">
-            text
+            Valet
           </div>
         </div>
         <div className="min-w-[20vw] h-[9vh] bg-[#ffffff] border-dotted border-1 border-[#030303] m-[2.5vw] rounded-[10px] flex flex-wrap">
           <div className="w-[20%] m-[3%] h-[80%]">
             <img
-              src={car}
+              src={ticket}
               alt="Car"
               style={{ width: "100%", height: "100%" }}
             />
           </div>
           <div className="login justify-center flex items-center  w-[70%] p-[1vw] ">
-            text
+            Reserved
           </div>
         </div>
       </div>

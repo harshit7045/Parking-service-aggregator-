@@ -8,5 +8,6 @@ const userRouter = express.Router();
 userRouter.post('/register', UserController.userRegister);
 userRouter.post('/login', UserController.loginUser);
 userRouter.get('/getuser', authMiddleware, UserController.getUser);
+userRouter.post('/addWalletBalance', authMiddleware, UserController.addWalletBalance);
 export default userRouter;
 
