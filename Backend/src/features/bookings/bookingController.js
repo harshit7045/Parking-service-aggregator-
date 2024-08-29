@@ -1,17 +1,15 @@
-import bookingmodel from "./bookingModel.js";
+import userModel from "../user/user.model.js";
 import parkingLotsController from "../parking_lots/prakinglotscontroller.js";
-import { MAX, v4 as uuidv4 } from "uuid";
+import { v4 as uuidv4 } from "uuid";
 import { sendbookingEmail } from "../../utils/nodeMailer.js";
-
-let bookingNumber;
-
+import bookingModel from "../../features/bookings/bookingModel.js";
+let x = bookingModel;
 const bookingController = {
   createBookingIot: async (req, res) => {
     const { name, pincode, vehicleUid } = req.body;
-    let bookingNumber = uuidv4();
-    console.log("fff" + req.user);
+    const bookingNumber = uuidv4();
 
-    let data = {
+    const data = {
       body: {
         name: name,
         pincode: pincode,
@@ -19,7 +17,7 @@ const bookingController = {
       },
     };
 
-     let lotNo;
+    let lotNo;
     try {
       lotNo = await parkingLotsController.makeBookingFromIotOnPlace(data, res);
       if (res.headersSent) return; // Exit if a response has already been sent
@@ -31,27 +29,26 @@ const bookingController = {
     }
 
     try {
-      const booking = await bookingmodel
-        .create({
-          name: name,
-          pincode: pincode,
-          vehicleUid: vehicleUid,
-          model: "iot",
-          bookingNumber: bookingNumber,
-          vehicleIn: true,
-          email: req.user.user,
-          Lotno: lotNo,
-          ownersPhoneNumber: req.user.phoneNumber,
-          iotBooking: {
-            status: true,
-            startTime: new Date().toISOString(),
-          },
-        })
-        .then((booking) => {
-          console.log("Booking created:" + booking);
-        });
+      const bookingData = {
+        name: name,
+        pincode: pincode,
+        vehicleUid: vehicleUid,
+        model: "iot",
+        bookingNumber: bookingNumber,
+        vehicleIn: true,
+        email: req.user.user,
+        Lotno: lotNo,
+        ownersPhoneNumber: req.user.phoneNumber,
+        iotBooking: {
+          status: true,
+          startTime: new Date().toISOString(),
+        },
+      };
 
-      if (!booking) {
+      const booking = new bookingModel(bookingData);
+      const result = await booking.save();
+
+      if (!result) {
         if (!res.headersSent) {
           return res
             .status(500)
@@ -59,12 +56,9 @@ const bookingController = {
         }
       }
 
-      if (!res.headersSent) {
-        return res.status(200).send(booking);
-      }
+      return res.status(200).send(result);
     } catch (error) {
       console.error("Error creating booking:", error);
-      console.log("Error creating booking:", error);
       if (!res.headersSent) {
         return res
           .status(500)
@@ -74,28 +68,65 @@ const bookingController = {
   },
 
   createBooking: async (req, res) => {
-    bookingNumber = uuidv4();
+    console.log(req.body);
+    const bookingNumber = uuidv4();
     const { name, pincode, vehicleUid, bookingModel } = req.body;
     const { model, time, date } = bookingModel;
-    console.log(req.body);
 
     try {
+      const user = await userModel.findOne({ email: req.user.user });
+
+      const walletBalance = user.walletBalance;
+      let bookingCost = 0;
       let bookingResponse;
       let bookingData;
 
       if (model === "hours") {
-        // Prepare the request body for hour-wise booking
-        req.body = {
-          bookingNumber: bookingNumber,
-          name: name,
-          pincode: pincode,
-          date: date,
-          start: new Date(time.startTime).getHours(),
-          end: new Date(time.endTime).getHours(),
-        };
+        const currentDate = new Date(date).toISOString().split("T")[0]; // Get current date in 'YYYY-MM-DD' format
+        const startTimeString = `${currentDate}T${
+          time.startTime.split(" ")[0]
+        }+05:30`;
+        const endTimeString = `${currentDate}T${
+          time.endTime.split(" ")[0]
+        }+05:30`;
+        console.log(startTimeString, endTimeString);
+        const startTime = new Date(startTimeString);
+        const endTime = new Date(endTimeString);
+        const hoursDifference = (endTime - startTime) / (1000 * 60 * 60);
+        bookingCost = hoursDifference * 100; // Assume rate is 100 per hour
+        console.log(
+          "1111"+
+          time.startTime,
+          time.endTime,
+          startTime,
+          endTime,
+          hoursDifference,
+          bookingCost
+        );
+        if (walletBalance < bookingCost) {
+          console.log("insufficient balence");
+          return res
+            .status(400)
+            .send(
+              `Insufficient wallet balance. Available: ${walletBalance}, Required: ${bookingCost}`
+            );
+        }
 
+         let a = {
+          body: {
+            bookingNumber: bookingNumber,
+            name: name,
+            pincode: pincode,
+            date: date,
+            start: new Date(`1970-01-01T${time.startTime.split(' ')[0]}Z`).getUTCHours(),
+            end: new Date(`1970-01-01T${time.endTime.split(' ')[0]}Z`).getUTCHours(),
+
+          },
+          
+        };
+        console.log(a+"hourwise booking");
         bookingResponse = await parkingLotsController.makeBookingOnlineHourWise(
-          req,
+          a,
           res
         );
 
@@ -105,7 +136,6 @@ const bookingController = {
             .send("No available lots for the specified time.");
         }
 
-        // Prepare booking data for hour-wise booking
         bookingData = {
           bookingNumber: bookingNumber,
           vehicleIn: false,
@@ -125,13 +155,25 @@ const bookingController = {
           datewiseBooking: {},
         };
       } else if (model === "date") {
-        // Prepare the request body for date-wise booking
+        const startDate = new Date(date[0]);
+        const endDate = new Date(date[1]);
+        const bookingDuration = (endDate - startDate) / (1000 * 60 * 60 * 24); // days
+        bookingCost = bookingDuration * 1000; // Assume rate is 1000 per day
+        console.log(date[0], date[1], bookingDuration, bookingCost);
+        if (walletBalance < bookingCost) {
+          return res
+            .status(400)
+            .send(
+              `Insufficient wallet balance. Available: ${walletBalance}, Required: ${bookingCost}`
+            );
+        }
+
         req.body = {
           bookingNumber: bookingNumber,
           name: name,
           pincode: pincode,
-          startDate: date[0], // Assuming `startTime` is the start date
-          endDate: date[1], // Assuming `endTime` is the end date
+          startDate: date[0],
+          endDate: date[1],
           vehicleUid: vehicleUid,
         };
 
@@ -143,10 +185,9 @@ const bookingController = {
         if (!bookingResponse && !res.headersSent) {
           return res
             .status(409)
-            .send("No available lots for the specified time.");
+            .send("No available lots for the specified dates.");
         }
 
-        // Prepare booking data for date-wise booking
         bookingData = {
           bookingNumber: bookingNumber,
           email: req.user.user,
@@ -165,24 +206,75 @@ const bookingController = {
           },
         };
       }
-
-      console.log("Booking Data:", bookingData);
-      const booking = new bookingmodel(bookingData);
+      console.log( "bookingData"+bookingData);
+      const booking = new x(bookingData);
       const result = await booking.save();
+      console.log("Before subtraction:", user.walletBalance, bookingCost);
+      user.walletBalance -= bookingCost;
+      console.log("After subtraction:", user.walletBalance);
+      await user.save();
 
-      if (!res.headersSent) {
-        return res.status(201).send(result);
-      }
+      await sendbookingEmail("swati7045@gmail.com", bookingData.Lotno);
 
-      await sendbookingEmail(req.user.user, bookingData.Lotno);
+      return res.status(201).send(result);
     } catch (error) {
       console.log("Error in createBooking:", error);
       if (!res.headersSent) {
-        return res.status(500).send(error);
+        return res.status(500).send("Error creating booking.");
       }
     }
   },
 
+  deleteBooking: async (req, res) => {
+    const bookingNumber = req.body.id;
+
+    try {
+      const booking = await bookingModel.findOne({
+        bookingNumber: bookingNumber,
+      });
+      if (!booking) {
+        return res.status(404).send("Booking not found");
+      }
+
+      const user = await userModel.findOne({ email: booking.email });
+      let bill = 0;
+      const currentTime = new Date();
+
+      if (booking.model === "iot") {
+        bill =
+          ((currentTime - new Date(booking.iotBooking.startTime)) /
+            (1000 * 60 * 60)) *
+          100; // Assume 100 per hour
+      } else if (booking.model === "hours") {
+        const endTime = new Date(booking.timewiseBooking.endTime);
+        if (currentTime > endTime) {
+          const extraTime = (currentTime - endTime) / (1000 * 60 * 60);
+          bill = extraTime * 100 * 10; // 10x for extra time
+        }
+      } else if (booking.model === "date") {
+        const endDate = new Date(booking.datewiseBooking.endDate);
+        if (currentTime > endDate) {
+          const extraTime = (currentTime - endDate) / (1000 * 60 * 60);
+          bill = extraTime * 100 * 10; // 10x for extra time
+        }
+      }
+
+      user.walletBalance -= bill;
+      await user.save();
+      let dummydata = {
+        body: booking,
+      };
+      await parkingLotsController.removeBookingFromIot(dummydata, res);
+      await bookingModel.deleteOne({ bookingNumber: bookingNumber });
+
+      return res.status(200).send("Booking deleted successfully.");
+    } catch (error) {
+      console.log("Error in deleteBooking:", error);
+      if (!res.headersSent) {
+        return res.status(500).send("Failed to delete booking.");
+      }
+    }
+  },
   findBookingByUidPincode: async (req, res) => {
     const uid = req.body.vehicleUid;
     const pincode = req.body.pincode;
@@ -192,7 +284,7 @@ const bookingController = {
     );
 
     try {
-      const booking = await bookingmodel.find({
+      const booking = await x.find({
         vehicleUid: uid,
         pincode: pincode,
       });
@@ -202,85 +294,6 @@ const bookingController = {
       console.error("Error finding booking:", error);
     }
   },
-
-  deleteBooking: async (req, res) => {
-    const bookingNumber = req.body.id;
-
-    try {
-        let billingDetails = {
-            body: {
-                bookingNumber: bookingNumber
-            }
-        };
-        const x={
-          body:await bookingmodel.findOne({bookingNumber: bookingNumber})
-        };
-        console.log(x);
-        let bill = await bookingController.createBillOfBooking(billingDetails, res);
-        await parkingLotsController.removeBookingFromIot(x, res);
-        const result = await bookingmodel.findOneAndDelete({
-            bookingNumber: bookingNumber,
-            
-        });
-
-        if (!result) {
-            console.log("Booking not found");
-            return res.status(404).send("Booking not found");
-        }
-
-        console.log("Booking deleted successfully");
-        return res.status(200).json({ message: "Booking deleted successfully", bill: bill.bill });
-
-    } catch (error) {
-        console.error("Error deleting booking:", error);
-        return res.status(500).send("An error occurred while deleting the booking");
-    }
-},
-  createBillOfBooking: async(req, res) => {
-    let bookingNo = req.body.bookingNumber;
-    let bill = 0;
-    let ratePerHour = 1000000000000;
-    let currentTime = new Date();
-    let booking= await bookingmodel.findOne({
-      bookingNumber:bookingNo
-    });
-    console.log(booking);
-    if (booking.model === "iot") {
-        bill = (currentTime - new Date(booking.iotBooking.startTime)) / (1000 * 60 * 60) * ratePerHour;
-    }
-
-    if (booking.model === "hour") {
-        let startTime = new Date(booking.timewiseBooking.startTime);
-        let endTime = new Date(booking.timewiseBooking.endTime);
-        let bookingDuration = (endTime - startTime) / (1000 * 60 * 60); 
-
-        if (currentTime > endTime) {
-            let extraTime = (currentTime - endTime) / (1000 * 60 * 60); 
-            let extraTimeCost = extraTime * ratePerHour * 10;
-            bill = extraTimeCost + (bookingDuration * ratePerHour);
-        } else {
-            bill = bookingDuration * ratePerHour;
-        }
-    }
-
-    if (booking.model === "date") {
-        let startDate = new Date(booking.datewiseBooking.startDate);
-        let endDate = new Date(booking.datewiseBooking.endDate);
-        let bookingDuration = (endDate - startDate) / (1000 * 60 * 60); 
-
-        if (currentTime > endDate) {
-            let extraTime = (currentTime - endDate) / (1000 * 60 * 60); 
-            let extraTimeCost = extraTime * ratePerHour * 10;
-            bill = extraTimeCost + (bookingDuration * ratePerHour);
-        } else {
-            bill = bookingDuration * ratePerHour;
-        }
-    }
-
-    console.log("Bill: ", bill);
-    return bill;
-}
-}
-;
+};
 
 export default bookingController;

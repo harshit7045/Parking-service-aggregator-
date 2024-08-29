@@ -122,6 +122,7 @@ const parkingLotsController = {
   },
 
   makeBookingOnlineHourWise: async (req, res) => {
+    console.log(req.body)
     const { name, pincode, date, start, end, bookingNumber } = req.body;
     console.log(
       `Hour-wise booking request received for ${name}, ${pincode}, date: ${date}, from ${start}:00 to ${end}:00`
@@ -161,7 +162,9 @@ const parkingLotsController = {
           (booking) => booking.date === date
         );
 
+
         if (hourwiseBookingFlag === -1) {
+          console.log("hourwiseBookingFlag: ", hourwiseBookingFlag);
           let time = Array(24).fill(false);
           for (let z = start; z <= end; z++) {
             time[z] = true;
@@ -175,6 +178,7 @@ const parkingLotsController = {
             `No previous hour bookings found for date ${date}. Creating new time slots.`
           );
         } else {
+          console.log("hourwiseBookingFlag: ", hourwiseBookingFlag);
           let time = lot.bookingsHourWise[hourwiseBookingFlag].time;
           let conflict = false;
 
@@ -409,7 +413,7 @@ const parkingLotsController = {
                 console.log("Booking not found in IoT bookings");
                 return res.status(404).send("Booking not found in IoT bookings");
             }
-        } else if (model === "datewise") {
+        } else if (model === "date") {
             index = bookedLot.bookingsDateWise.findIndex(booking => booking.bookingNumber === bookingNumber);
             if (index !== -1) {
                 bookedLot.bookingsDateWise.splice(index, 1);
@@ -417,7 +421,7 @@ const parkingLotsController = {
                 console.log("Booking not found in datewise bookings");
                 return res.status(404).send("Booking not found in datewise bookings");
             }
-        } else if (model === "hourwise") {
+        } else if (model === "hours") {
             index = bookedLot.bookingsHourWise.findIndex(booking => booking.bookingNumber === bookingNumber);
             if (index !== -1) {
                 bookedLot.bookingsHourWise.splice(index, 1);
@@ -426,6 +430,7 @@ const parkingLotsController = {
                 return res.status(404).send("Booking not found in hourwise bookings");
             }
         } else {
+          console.log(model);
             console.log("Invalid model type");
             return res.status(400).send("Invalid model type");
         }

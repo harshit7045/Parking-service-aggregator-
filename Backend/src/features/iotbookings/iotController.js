@@ -49,19 +49,45 @@ const iotController = {
           if (now >= startDate && now <= endDate) {
             booking.vehicleIn = true;
             bookingFound = true;
+
+            // Mark the `vehicleIn` field as modified and save the document
+            booking.markModified("vehicleIn");
+            await booking.save();
+
             break;
           }
         }
 
-        if (booking.model === "hour") {
-          const bookingDate = new Date(booking.timewiseBooking.date);
-          const bookingStartTime = new Date(booking.timewiseBooking.startTime);
-          const bookingEndTime = new Date(booking.timewiseBooking.endTime);
+        if (booking.model === "hours") {
+          const startTime = booking.timewiseBooking.startTime.split(" ")[0]; // '05:00:00'
+          const endTime = booking.timewiseBooking.endTime.split(" ")[0]; // '06:00:00'
 
-          if (now.toDateString() === bookingDate.toDateString() &&
-              now >= bookingStartTime && now <= bookingEndTime) {
+          let currentDate = booking.timewiseBooking.date; // Ensure this is in 'YYYY-MM-DD' format
+          const formattedDate = currentDate.toISOString().split('T')[0]; 
+          currentDate=formattedDate;
+          const startTimeString = `${currentDate}T${startTime}+05:30`;
+          const endTimeString = `${currentDate}T${endTime}+05:30`;
+          console.log(startTimeString, endTimeString);
+          const bookingDate = new Date(booking.timewiseBooking.date);
+          const bookingStartTime = new Date(startTimeString);
+          const bookingEndTime = new Date(endTimeString);
+
+          console.log(
+            "dddd  " + currentDate,
+            bookingEndTime.toTimeString(), bookingStartTime.toTimeString()
+          );
+          if (
+            now.toDateString() === bookingDate.toDateString() &&
+            now >= bookingStartTime &&
+            now <= bookingEndTime
+          ) {
             booking.vehicleIn = true;
             bookingFound = true;
+
+            // Mark the `vehicleIn` field as modified and save the document
+            booking.markModified("vehicleIn");
+            await booking.save();
+
             break;
           }
         }
@@ -77,7 +103,11 @@ const iotController = {
       try {
         await bookingController.deleteBooking(reqDelete, res);
         if (!res.headersSent) {
-          return res.status(200).send("Vehicle is already checked in the parking lot. It’s an exit scan request.");
+          return res
+            .status(200)
+            .send(
+              "Vehicle is already checked in the parking lot. It’s an exit scan request."
+            );
         }
       } catch (error) {
         console.error("Error deleting booking:", error);
@@ -85,15 +115,16 @@ const iotController = {
           return res.status(500).send("Error processing exit scan request.");
         }
       }
-    }
-
-    else if (bookingFound) {
+    } else if (bookingFound) {
       console.log("Valid booking found, vehicle is now checked in.");
       if (!res.headersSent) {
         return res.status(200).send("Vehicle is now checked in.");
       }
     } else {
       console.log("No valid booking found, creating a new booking request.");
+      if (bookings) {
+        console.log("Booking found but currently not valid");
+      }
       const vehicleReq = {
         body: {
           uid: req.body.message,
@@ -101,7 +132,10 @@ const iotController = {
       };
 
       try {
-        const vehicleResponse = await vehicleController.getVehicleByUid(vehicleReq, res);
+        const vehicleResponse = await vehicleController.getVehicleByUid(
+          vehicleReq,
+          res
+        );
         if (res.headersSent) return;
 
         const user = vehicleResponse; // Ensure you get the user data correctly

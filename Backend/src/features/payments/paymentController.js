@@ -4,7 +4,8 @@ const YOUR_DOMAIN = 'http://localhost:3000';
 
 const paymentController = {
   createCheckOutSession: async (req, res) => {
-    console.log(req.body.amount);
+    try{
+      console.log(req.body.amount);
     const session = await stripe.checkout.sessions.create({
       ui_mode: "embedded",
       line_items: [
@@ -25,6 +26,10 @@ const paymentController = {
     });
 
     res.send({ clientSecret: session.client_secret });
+    } catch (error) { 
+      console.error("Error creating checkout session:", error);
+      res.status(500).send({ error: "Failed to create checkout session" });
+    }
   },
 
   sessionStatus: async (req, res) => {
