@@ -58,12 +58,13 @@ export default function CarImgMediaCard({ title, description, image, data }) {
   const [alertData, setAlertData] = useState({ show: false, message: '', severity: '' });
 
   const handleBooking = () => {
-    data.vehicleUid = title; // Update vehicleUid based on the card's title
+    data.vehicleUid = title; 
     booking(data);
   };
 
   async function booking(data) {
-    console.log("Booking Data:", data); // Check the structure of data
+    console.log("Booking Data:", data); 
+    let message;
     try {
       const response = await fetch("http://localhost:8000/api/bookings/book", {
         method: "POST",
@@ -75,26 +76,28 @@ export default function CarImgMediaCard({ title, description, image, data }) {
       });
 
       if (!response.ok) {
+        message=await response.json();
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
       const responseData = await response.json();
       console.log("Booking successful:", responseData);
-
-      // Show success alert
+      
+     
       setAlertData({
         show: true,
-        message: "Booking done",
-        severity: "success", // Corrected spelling
+        message: responseData.message,
+        severity: "success", 
       });
     } catch (error) {
       console.log('Error booking:', error);
-
-      // Show failure alert
+      console.log(message);
+      const outputMessage = message?.message || "Please select the date and time properly";
       setAlertData({
         show: true,
-        message: "Booking failed",
-        severity: "error", // MUI expects "error"
+        
+        message: outputMessage,
+        severity: "error",
       });
     }
   }

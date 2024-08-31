@@ -15,15 +15,29 @@ let hoursdate = {};
 
 function BasicDatePicker() {
   return (
-    <LocalizationProvider dateAdapter={AdapterDayjs}>
+    <LocalizationProvider dateAdapter={AdapterDayjs} style={{ width: "80vw" }}>
       <DemoContainer
         components={["DatePicker"]}
-        style={{
+        sx={{
           width: "80vw",
+          display: "block",
+          textAlign: "center",
+          margin:"5vw",
+          
+          
         }}
       >
-        <DatePicker
-          label="Basic date picker"
+        <DatePicker 
+          
+          sx={{
+            width: "100%",  // Set to 100% width
+            flexGrow: 1,     // Ensure it grows within its container
+            maxWidth: "none", // Remove any max-width constraints
+            textAlign: "center",
+            
+            
+          }}
+          label="Please select the date in which you want to book Hours Wise"
           onChange={(value) => {
             // Convert the date to Indian Standard Time (IST)
             const dateInTimezone = dayjs(value).tz('Asia/Kolkata');

@@ -2,8 +2,13 @@ import React, { useState } from 'react';
 import Cookies from 'js-cookie'; 
 import { useNavigate } from 'react-router-dom';
 import MapWithSearch from './map';
-
+import SimpleAlert from '../homepage/alertbox';
 // Define getLatlong function outside the component
+const alertBarStyle = {
+ 
+  width: '100%',
+  zIndex: 1,
+};
 const getLatlong = async (pincode) => {
   const url = `https://india-pincode-with-latitude-and-longitude.p.rapidapi.com/api/v1/pincode/${pincode}`;
   const options = {
@@ -34,7 +39,8 @@ const getLatlong = async (pincode) => {
 function ParkingLot() {
   const [parkingLots, setParkingLots] = useState([]);
   const [pincode, setPincode] = useState("");
-  const [searchPincode, setSearchPincode] = useState(null); // To control when the map reloads
+  const [searchPincode, setSearchPincode] = useState(null);
+  const [alertData, setAlertData] = useState({ show: false, message: '', severity: '' }); // To control when the map reloads
   const navigate = useNavigate(); 
 
   const handleSearch = async () => {
@@ -50,13 +56,24 @@ function ParkingLot() {
       if (!responseUser.ok) {
         throw new Error(`HTTP error! Status: ${responseUser.status}`);
       }
-
+     
       const data = await responseUser.json();
+      console.log("Parking Lots:", data.length);
+      if(data.length === 0){
+        setAlertData({
+          show: true, 
+          message: "No Parking Lots Found please take any other pin code",
+          severity: "error",
+        });
+      }else{
+        setAlertData({
+          show: true, 
+          message: "Parking Lots Found Scroll to botto      m for booking",
+          severity: "success",
+        });
+      }
       setParkingLots(data);
-
-      // Fetch lat/long data for the pincode
       const { lat, lng } = await getLatlong(pincode);
-      // Set the searchPincode state with an object containing lat and lng
       setSearchPincode({ lat, lng });
 
     } catch (error) {
@@ -79,6 +96,9 @@ function ParkingLot() {
           onChange={(e) => setPincode(e.target.value)}
           className="border rounded px-4 py-2 w-full mb-2"
         />
+         <div style={alertBarStyle}>
+          <SimpleAlert severity={alertData.severity} message={alertData.message} />
+        </div>
         <button onClick={handleSearch} className="border rounded px-4 py-2 bg-gray-200">Search</button>
       </div>
       <div className="mb-4 flex justify-center align-middle">

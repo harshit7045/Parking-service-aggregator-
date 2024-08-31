@@ -101,30 +101,36 @@ export default function Bookingform() {
 
   return (
     <>
-      <div className="bg-[#ffffff] border-dotted border-1 border-[#030303] m-[2.5vw] rounded-[10px] card">
+      <div className="bg-[#ffffff]  m-[2.5vw]  card">
+        <div className="border-dotted border-[5px] border-[#b16163] rounded-[10px] m-[5vh]">
         <h6 style={textStyle}>Parking Lot Name: {parkingLotName}</h6>
         <h6 style={textStyle}>Pincode: {pincode}</h6>
-        <div className="booking-options flex place-content-evenly mr-[2vw]">
-          <Button variant="contained" onClick={() => handleBookingTypeChange("date")}>Book Date-wise</Button>
-          <Button variant="contained" onClick={() => handleBookingTypeChange("time")}>Book Hour-wise</Button>
+        </div>
+        <div className=" bg-[#e0e0e0] p-[5vh] rounded-2xl border-solid border-[#b16163]">
+        <div className="booking-options flex place-content-evenly m-[6vw]  ">
+          <Button variant="contained" onClick={() => handleBookingTypeChange("date")} sx={{ backgroundColor: '#b16163' }}>Book Date-wise </Button>
+          <Button variant="contained" onClick={() => handleBookingTypeChange("time")}sx={{ backgroundColor: '#b16163' }}>Book Hour-wise</Button>
         </div>
         {bookingType === "date" ? (
-          <BasicDateRangePicker />
+          <div className="" >
+          <BasicDateRangePicker  />
+          </div>
         ) : (
           <>
-          <div>
+          <div className="flex flex-row justify-between flex-wrap w-[100vw]  m-0 p-[2vw]">
+            
             <BasicDatePicker />
           </div>
-          <div className="flex flex-row justify-between flex-wrap">
+          <div className="flex flex-row justify-between flex-wrap m-[10vw] mt-0 ">
 
             <StaticTimePickerLandscape label="Start Time"  />
             <EndStaticTimePickerLandscape label="End Time" />
           </div>
           </>
         )}
-        <Button variant="contained" onClick={handleOkayClick}>Okay</Button>
+        <Button variant="contained" onClick={handleOkayClick} sx={{ backgroundColor: '#b16163' }}>Click here to finalize booking Timings</Button>
       </div>
-
+      </div>
       <Dialog open={dialogOpen} onClose={handleDialogClose}>
         <DialogTitle>Booking Details</DialogTitle>
         <DialogContent>
@@ -132,7 +138,7 @@ export default function Bookingform() {
           <Typography>End Time: {endTime ? endTime.toString() : "N/A"}</Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleDialogClose}>Close</Button>
+          <Button onClick={handleDialogClose} sx={{ backgroundColor: '#b16163' }}>Close</Button>
         </DialogActions>
       </Dialog>
       <UserProfile dat={dat} /> {/* Ensure UserProfile receives updated `dat` */}

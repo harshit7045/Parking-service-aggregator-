@@ -1,10 +1,15 @@
 import React from "react";
 import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
+import SimpleAlert from "../../homepage/alertbox";
+import { useState } from "react";
+const alertBarStyle = {
+  width: "100%",
+  zIndex: 1,
+};
 async function loginUser() {
   const email = document.getElementById("email").value;
   const password = document.getElementById("password").value;
-  
 
   try {
     const response = await fetch("http://localhost:8000/api/users/login", {
@@ -14,22 +19,37 @@ async function loginUser() {
       },
       body: JSON.stringify({ email, password }),
     });
-     
+
     const data = await response.json();
     console.log("Document Cookies:", response.cookie);
+    if (data.token) {
+      loginNagivate();
+    } else {
+      alert({ show: false, message: data.message, severity: "error" });
+    }
     console.log(data.token);
-    Cookies.set("token", data.token, { expires: 7}) ;
-    
+    Cookies.set("token", data.token, { expires: 7 });
   } catch (error) {
     console.log(error);
   }
 }
-
+let loginNagivate;
+let alert;
 const LoginWithGoogleButton = () => {
+  const [alertData, setAlertData] = useState({
+    show: false,
+    message: "",
+    severity: "",
+  });
+  alert = setAlertData;
   const navigate = useNavigate();
   const handleClick = () => {
     navigate("/register");
-};
+  };
+  const handleLogin = () => {
+    navigate("/profile");
+  };
+  loginNagivate = handleLogin;
   return (
     <div className="relative flex items-center justify-center h-screen w-full">
       <div className="absolute inset-0 bg-black opacity-50 backdrop-blur-sm"></div>
@@ -124,8 +144,17 @@ const LoginWithGoogleButton = () => {
                 className="text-xs text-gray-500 capitalize text-center w-full"
               >
                 Don&apos;t have any account yet?
-                <span className="text-blue-700" onClick={handleClick}> Sign Up</span>
+                <span className="text-blue-700" onClick={handleClick}>
+                  {" "}
+                  Sign Up
+                </span>
               </a>
+            </div>
+            <div style={alertBarStyle}>
+              <SimpleAlert
+                severity={alertData.severity}
+                message={alertData.message}
+              />
             </div>
           </div>
         </div>

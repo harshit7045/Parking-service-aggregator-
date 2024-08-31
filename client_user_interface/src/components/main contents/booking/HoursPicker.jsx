@@ -6,7 +6,7 @@ let startTime={}
  function StaticTimePickerLandscape() {
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
-      <StaticTimePicker onChange={(value) => {
+      <StaticTimePicker sx={{borderRadius: "20px"}} onChange={(value) => {
         startTime=value.$d.toTimeString()
         console.log(value.$d)
       }

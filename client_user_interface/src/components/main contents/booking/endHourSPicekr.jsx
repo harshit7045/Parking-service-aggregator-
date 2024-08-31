@@ -6,7 +6,7 @@ let endTime={};
  function EndStaticTimePickerLandscape() {
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
-      <StaticTimePicker orientation="landscape"
+      <StaticTimePicker orientation="landscape" sx={{borderRadius: "20px"}}
       onChange={(value)=>{
          endTime=value.$d.toTimeString()
          console.log(value.$d)

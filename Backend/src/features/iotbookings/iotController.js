@@ -1,5 +1,6 @@
 import bookingController from "../bookings/bookingController.js";
 import vehicleController from "../vehicle/vehicleController.js";
+import { sendEmail } from "../../utils/nodeMailer.js";
 
 const iotController = {
   iotbooking: async (req, res) => {
@@ -63,8 +64,8 @@ const iotController = {
           const endTime = booking.timewiseBooking.endTime.split(" ")[0]; // '06:00:00'
 
           let currentDate = booking.timewiseBooking.date; // Ensure this is in 'YYYY-MM-DD' format
-          const formattedDate = currentDate.toISOString().split('T')[0]; 
-          currentDate=formattedDate;
+          const formattedDate = currentDate.toISOString().split("T")[0];
+          currentDate = formattedDate;
           const startTimeString = `${currentDate}T${startTime}+05:30`;
           const endTimeString = `${currentDate}T${endTime}+05:30`;
           console.log(startTimeString, endTimeString);
@@ -74,7 +75,8 @@ const iotController = {
 
           console.log(
             "dddd  " + currentDate,
-            bookingEndTime.toTimeString(), bookingStartTime.toTimeString()
+            bookingEndTime.toTimeString(),
+            bookingStartTime.toTimeString()
           );
           if (
             now.toDateString() === bookingDate.toDateString() &&
@@ -84,7 +86,7 @@ const iotController = {
             booking.vehicleIn = true;
             bookingFound = true;
 
-            // Mark the `vehicleIn` field as modified and save the document
+           
             booking.markModified("vehicleIn");
             await booking.save();
 
@@ -93,6 +95,18 @@ const iotController = {
         }
       }
     }
+    const vehicleReq = {
+      body: {
+        uid: req.body.message,
+      },
+    };
+    const vehicleResponse = await vehicleController.getVehicleByUid(
+      vehicleReq,
+      res
+    );
+    if (res.headersSent) return;
+
+    let email = vehicleResponse.email;
 
     if (alreadyEnteredTheLot) {
       const reqDelete = {
@@ -101,8 +115,13 @@ const iotController = {
         },
       };
       try {
-        await bookingController.deleteBooking(reqDelete, res);
         if (!res.headersSent) {
+          sendEmail(
+            email,
+            "Thanks for parking with us we hope to see you again soon."
+          );
+        await bookingController.deleteBooking(reqDelete, res);
+        
           return res
             .status(200)
             .send(
@@ -111,11 +130,16 @@ const iotController = {
         }
       } catch (error) {
         console.error("Error deleting booking:", error);
+
         if (!res.headersSent) {
           return res.status(500).send("Error processing exit scan request.");
         }
       }
     } else if (bookingFound) {
+      sendEmail(
+        email,
+        "Your  booking was found you are now checked in the parking lot."
+      );
       console.log("Valid booking found, vehicle is now checked in.");
       if (!res.headersSent) {
         return res.status(200).send("Vehicle is now checked in.");
@@ -124,6 +148,11 @@ const iotController = {
       console.log("No valid booking found, creating a new booking request.");
       if (bookings) {
         console.log("Booking found but currently not valid");
+        sendEmail(
+          email,
+          "No booking was not found for this time and date . Creating a new booking Thanks a lot for using our services"
+        );
+
       }
       const vehicleReq = {
         body: {

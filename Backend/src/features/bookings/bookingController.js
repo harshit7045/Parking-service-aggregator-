@@ -1,9 +1,10 @@
 import userModel from "../user/user.model.js";
 import parkingLotsController from "../parking_lots/prakinglotscontroller.js";
 import { v4 as uuidv4 } from "uuid";
-import { sendbookingEmail } from "../../utils/nodeMailer.js";
+import { sendbookingEmail,sendEmail } from "../../utils/nodeMailer.js";
 import bookingModel from "../../features/bookings/bookingModel.js";
 let x = bookingModel;
+
 const bookingController = {
   createBookingIot: async (req, res) => {
     const { name, pincode, vehicleUid } = req.body;
@@ -105,6 +106,7 @@ const bookingController = {
         );
         if (walletBalance < bookingCost) {
           console.log("insufficient balence");
+          sendEmail(req.user.user, `Insufficient wallet balance. Available: ${walletBalance}, Required: ${bookingCost}`);
           return res
             .status(400)
             .send(
@@ -157,14 +159,16 @@ const bookingController = {
       } else if (model === "date") {
         const startDate = new Date(date[0]);
         const endDate = new Date(date[1]);
-        const bookingDuration = (endDate - startDate) / (1000 * 60 * 60 * 24); // days
-        bookingCost = bookingDuration * 1000; // Assume rate is 1000 per day
+        const bookingDuration = (endDate - startDate) / (1000 * 60 * 60 * 24); 
+        bookingCost = bookingDuration * 1000; 
         console.log(date[0], date[1], bookingDuration, bookingCost);
         if (walletBalance < bookingCost) {
+          console.log("insufficient balence");
+          sendEmail(req.user.user, `Insufficient wallet balance. Available: ${walletBalance}, Required: ${bookingCost}`);
           return res
             .status(400)
             .send(
-              `Insufficient wallet balance. Available: ${walletBalance}, Required: ${bookingCost}`
+              {message:"Insufficient wallet balance. Available: "+walletBalance+", Required: "+bookingCost}
             );
         }
 
@@ -176,7 +180,11 @@ const bookingController = {
           endDate: date[1],
           vehicleUid: vehicleUid,
         };
-
+        if(!date[0] || !date[1]){
+          return res
+            .status(400)
+            .send({message:"Please enter valid dates"});
+        }
         bookingResponse = await parkingLotsController.makeBookingOnlineDateWise(
           req,
           res
@@ -185,7 +193,7 @@ const bookingController = {
         if (!bookingResponse && !res.headersSent) {
           return res
             .status(409)
-            .send("No available lots for the specified dates.");
+            .send({message:"No available lots for the specified dates."});
         }
 
         bookingData = {
@@ -214,7 +222,7 @@ const bookingController = {
       console.log("After subtraction:", user.walletBalance);
       await user.save();
 
-      await sendbookingEmail("swati7045@gmail.com", bookingData.Lotno);
+      await sendbookingEmail(req.user.user, bookingData.Lotno);
 
       return res.status(201).send(result);
     } catch (error) {
