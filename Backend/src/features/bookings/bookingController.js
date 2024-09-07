@@ -21,7 +21,7 @@ const bookingController = {
     let lotNo;
     try {
       lotNo = await parkingLotsController.makeBookingFromIotOnPlace(data, res);
-      if (res.headersSent) return; // Exit if a response has already been sent
+      if (res.headersSent) return; 
     } catch (error) {
       console.error("Error in makeBookingFromIotOnPlace:", error);
       if (!res.headersSent) {
@@ -83,7 +83,7 @@ const bookingController = {
       let bookingData;
 
       if (model === "hours") {
-        const currentDate = new Date(date).toISOString().split("T")[0]; // Get current date in 'YYYY-MM-DD' format
+        const currentDate = new Date(date).toISOString().split("T")[0]; 
         const startTimeString = `${currentDate}T${
           time.startTime.split(" ")[0]
         }+05:30`;
@@ -94,7 +94,7 @@ const bookingController = {
         const startTime = new Date(startTimeString);
         const endTime = new Date(endTimeString);
         const hoursDifference = (endTime - startTime) / (1000 * 60 * 60);
-        bookingCost = hoursDifference * 100; // Assume rate is 100 per hour
+        bookingCost = hoursDifference * 100; 
         console.log(
           "1111"+
           time.startTime,
@@ -252,18 +252,18 @@ const bookingController = {
         bill =
           ((currentTime - new Date(booking.iotBooking.startTime)) /
             (1000 * 60 * 60)) *
-          100; // Assume 100 per hour
+          100; 
       } else if (booking.model === "hours") {
         const endTime = new Date(booking.timewiseBooking.endTime);
         if (currentTime > endTime) {
           const extraTime = (currentTime - endTime) / (1000 * 60 * 60);
-          bill = extraTime * 100 * 10; // 10x for extra time
+          bill = extraTime * 100 * 10; 
         }
       } else if (booking.model === "date") {
         const endDate = new Date(booking.datewiseBooking.endDate);
         if (currentTime > endDate) {
           const extraTime = (currentTime - endDate) / (1000 * 60 * 60);
-          bill = extraTime * 100 * 10; // 10x for extra time
+          bill = extraTime * 100 * 10; 
         }
       }
 

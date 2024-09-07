@@ -1,10 +1,8 @@
 import mongoose from 'mongoose';
-
-// Define the schema for each booking
 const bookingSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User', // Assuming you have a User model
+    ref: 'User',
     required: true
   },
   vehicleNumber: {
@@ -20,7 +18,7 @@ const bookingSchema = new mongoose.Schema({
   }
 });
 
-// Define the parking lot schema
+
 const parkingLotSchema = new mongoose.Schema({
   name: {
     type: String,

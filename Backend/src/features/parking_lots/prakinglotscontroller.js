@@ -130,7 +130,7 @@ const parkingLotsController = {
 
     try {
       let data = await ParkingLotModel.findOne({ name, pincode });
-
+   
       if (!data) {
         console.log("Parking lot not found");
         return res.status(404).send("Parking lot not found");
@@ -233,7 +233,7 @@ const parkingLotsController = {
     const { name, pincode, bookingNumber } = req.body;
 
     try {
-      // Find the parking lot
+      
       const lot = await ParkingLotModel.findOne({ name, pincode });
 
       if (!lot) {
@@ -243,13 +243,13 @@ const parkingLotsController = {
 
       let lotFound = false;
 
-      // Iterate through the lots
+      
       for (let i = 0; i < lot.lots.length; i++) {
         const currentLot = lot.lots[i];
 
-        // Check if the lot is reserved for IoT bookings and is not already occupied
+       
         if (currentLot.iotbooking && !currentLot.occupied) {
-          // Mark the lot as occupied and add the booking details
+          
           currentLot.occupied = true;
           currentLot.bookings.push({
             bookingNumber: bookingNumber,
@@ -271,7 +271,7 @@ const parkingLotsController = {
           .send("No available IoT lots or all IoT lots are occupied.");
       }
 
-      // Mark the document as modified and save the changes
+   
       lot.markModified("lots");
       await lot.save();
       return lot.lotNo;
@@ -309,10 +309,9 @@ const parkingLotsController = {
             startTime: new Date().toISOString(),
           });
 
-          // Mark the 'lots' array as modified
           lot.markModified("lots");
 
-          // Save the lot status
+    
           await lot.save();
           console.log("Data successfully saved.");
           console.log("IoT booking successful, lot number:", lotNo);
@@ -435,14 +434,14 @@ const parkingLotsController = {
             return res.status(400).send("Invalid model type");
         }
 
-        // Update the 'occupied' status based on the model and remaining bookings
+       
         if (model === "iot" && bookedLot.bookings.length === 0) {
             bookedLot.occupied = false;
         } else if (bookedLot.bookingsDateWise.length === 0 && bookedLot.bookingsHourWise.length === 0) {
             bookedLot.occupied = false;
         }
 
-        // Mark the modified subdocument
+      
         lot.markModified('lots');
 
         await lot.save();

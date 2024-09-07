@@ -141,7 +141,7 @@ export default function Bookingform() {
           <Button onClick={handleDialogClose} sx={{ backgroundColor: '#b16163' }}>Close</Button>
         </DialogActions>
       </Dialog>
-      <UserProfile dat={dat} /> {/* Ensure UserProfile receives updated `dat` */}
+      <UserProfile dat={dat} /> {}
     </>
   );
 }

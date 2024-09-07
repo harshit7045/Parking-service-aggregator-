@@ -6,19 +6,19 @@ const iotController = {
   iotbooking: async (req, res) => {
     console.log("IOT booking request received - Message: " + req.body.message);
 
-    // Prepare request for finding booking
+  
     const newReq = {
       body: {
-        vehicleUid: req.body.message, // Assuming message is vehicleUid
+        vehicleUid: req.body.message, 
         pincode: req.body.pincode,
       },
     };
 
-    // Retrieve bookings
+    
     let bookings;
     try {
       bookings = await bookingController.findBookingByUidPincode(newReq, res);
-      if (res.headersSent) return; // Exit if a response has already been sent
+      if (res.headersSent) return; 
     } catch (error) {
       console.error("Error finding booking:", error);
       if (!res.headersSent) {
@@ -37,7 +37,7 @@ const iotController = {
       const booking = bookings[i];
       if (booking.vehicleIn === true) {
         alreadyEnteredTheLot = true;
-        bookingData = booking; // Corrected index usage
+        bookingData = booking; 
         break;
       }
 
@@ -46,12 +46,12 @@ const iotController = {
           const startDate = new Date(booking.datewiseBooking.startDate);
           const endDate = new Date(booking.datewiseBooking.endDate);
 
-          // Compare only date parts, ignoring time
+ 
           if (now >= startDate && now <= endDate) {
             booking.vehicleIn = true;
             bookingFound = true;
 
-            // Mark the `vehicleIn` field as modified and save the document
+      
             booking.markModified("vehicleIn");
             await booking.save();
 
@@ -60,10 +60,10 @@ const iotController = {
         }
 
         if (booking.model === "hours") {
-          const startTime = booking.timewiseBooking.startTime.split(" ")[0]; // '05:00:00'
-          const endTime = booking.timewiseBooking.endTime.split(" ")[0]; // '06:00:00'
+          const startTime = booking.timewiseBooking.startTime.split(" ")[0]; 
+          const endTime = booking.timewiseBooking.endTime.split(" ")[0]; 
 
-          let currentDate = booking.timewiseBooking.date; // Ensure this is in 'YYYY-MM-DD' format
+          let currentDate = booking.timewiseBooking.date; 
           const formattedDate = currentDate.toISOString().split("T")[0];
           currentDate = formattedDate;
           const startTimeString = `${currentDate}T${startTime}+05:30`;
@@ -167,7 +167,7 @@ const iotController = {
         );
         if (res.headersSent) return;
 
-        const user = vehicleResponse; // Ensure you get the user data correctly
+        const user = vehicleResponse; 
         console.log("User:", user);
         const data = {
           body: {
@@ -177,7 +177,7 @@ const iotController = {
             bookingModel: {
               model: "iot",
             },
-            name: "ram", // Assuming message is vehicleUid
+            name: "ram", 
           },
           user: {
             user: user.email,
