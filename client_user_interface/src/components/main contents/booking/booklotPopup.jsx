@@ -153,7 +153,7 @@ async function getUserProfile() {
   };
 
   try {
-    const responseVehicles = await fetch("http://localhost:8000/api/vehicles/getvehicles", {
+    const responseVehicles = await fetch(`http://${process.env.REACT_APP_BACKEND_IP}:${process.env.REACT_APP_BACKEND_PORT}/api/vehicles/getvehicles`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -173,7 +173,7 @@ async function getUserProfile() {
   }
 
   try {
-    const responseUser = await fetch("http://localhost:8000/api/users/getuser", {
+    const responseUser = await fetch(`http://${process.env.REACT_APP_BACKEND_IP}:${process.env.REACT_APP_BACKEND_PORT}/api/users/getuser`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",

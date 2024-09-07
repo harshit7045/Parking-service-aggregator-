@@ -3,6 +3,8 @@ import Cookies from 'js-cookie';
 import { useNavigate } from 'react-router-dom';
 import MapWithSearch from './map';
 import SimpleAlert from '../homepage/alertbox';
+
+
 // Define getLatlong function outside the component
 const alertBarStyle = {
  
@@ -45,14 +47,14 @@ function ParkingLot() {
 
   const handleSearch = async () => {
     try {
-      const responseUser = await fetch(`http://localhost:8000/api/parking/getlots?pincode=${pincode}`, {
+      const responseUser = await fetch(`http://${process.env.REACT_APP_BACKEND_IP}:${process.env.REACT_APP_BACKEND_PORT}/api/parking/getlots?pincode=${pincode}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
           "authorization": Cookies.get("token"),
         },
       });
-
+      console.log(process.env.REACT_APP_BACKEND_IP+":"+process.env.REACT_APP_BACKEND_PORT+"/api/parking/getlots?pincode="+pincode);
       if (!responseUser.ok) {
         throw new Error(`HTTP error! Status: ${responseUser.status}`);
       }
@@ -77,6 +79,7 @@ function ParkingLot() {
       setSearchPincode({ lat, lng });
 
     } catch (error) {
+      console.log(process.env.REACT_APP_BACKEND_IP+":"+process.env.REACT_APP_BACKEND_PORT+"/api/parking/getlots?pincode="+pincode);
       console.error('Error fetching parking lots:', error);
     }
   };

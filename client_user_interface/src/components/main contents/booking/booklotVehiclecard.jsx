@@ -66,7 +66,7 @@ export default function CarImgMediaCard({ title, description, image, data }) {
     console.log("Booking Data:", data); 
     let message;
     try {
-      const response = await fetch("http://localhost:8000/api/bookings/book", {
+      const response = await fetch(`http://${process.env.REACT_APP_BACKEND_IP}:${process.env.REACT_APP_BACKEND_PORT}/api/bookings/book`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -91,11 +91,12 @@ const RegistrationForm = () => {
         vehicleNumber: vehicle.vehicleNumber,
         category: vehicle.category,
         phoneNumber: formData.phoneNumber,
+        email: formData.email,
       })),
     };
 
     try {
-      const response = await fetch("http://localhost:8000/api/users/register", {
+      const response = await fetch(`http://${process.env.REACT_APP_BACKEND_IP}:${process.env.REACT_APP_BACKEND_PORT}/api/users/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

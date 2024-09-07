@@ -12,14 +12,14 @@ async function loginUser() {
   const password = document.getElementById("password").value;
 
   try {
-    const response = await fetch("http://localhost:8000/api/users/login", {
+    const response = await fetch(`http://${process.env.REACT_APP_BACKEND_IP}:${process.env.REACT_APP_BACKEND_PORT}/api/users/login`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ email, password }),
     });
-
+    console.log(process.env.BACKENDIP);
     const data = await response.json();
     console.log("Document Cookies:", response.cookie);
     if (data.token) {

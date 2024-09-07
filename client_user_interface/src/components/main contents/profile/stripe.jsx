@@ -16,7 +16,7 @@ const CheckoutForm = () => {
   const { amount } = location.state || { amount: 0 }; // Default to 0 if no amount is passed
 
   const fetchClientSecret = useCallback(() => {
-    return fetch("http://localhost:8000/api/payment/create-checkout-session", {
+    return fetch(`http://${process.env.REACT_APP_BACKEND_IP}:${process.env.REACT_APP_BACKEND_PORT}/api/payment/create-checkout-session`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -57,7 +57,7 @@ const Return = () => {
 
       try {
         const response = await fetch(
-          `http://localhost:8000/api/payment/session-status?session_id=${sessionId}`
+          `http://${process.env.REACT_APP_BACKEND_IP}:${process.env.REACT_APP_BACKEND_PORT}/api/payment/session-status?session_id=${sessionId}`
         );
         const data = await response.json();
 
@@ -146,7 +146,7 @@ async function addWalletBalance(amount) {
     console.log("Amount to be added to wallet:", amount); // Debugging line
 
     const response = await fetch(
-      "http://localhost:8000/api/users/addwalletbalance",
+      "http://" + process.env.REACT_APP_BACKEND_IP + ":" + process.env.REACT_APP_BACKEND_PORT + "/api/users/addwalletbalance",
       {
         method: "POST",
         headers: {
