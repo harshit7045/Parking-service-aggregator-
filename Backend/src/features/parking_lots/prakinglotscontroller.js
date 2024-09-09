@@ -1,5 +1,5 @@
 import ParkingLotModel from "./parkingLotsModel.js";
-
+import redis from "../../db/redis.js";
 function isDateBetween(dateToCheck, startDate, endDate) {
   const date = new Date(dateToCheck);
   const start = new Date(startDate);
@@ -122,7 +122,7 @@ const parkingLotsController = {
   },
 
   makeBookingOnlineHourWise: async (req, res) => {
-    console.log(req.body)
+    console.log(req.body);
     const { name, pincode, date, start, end, bookingNumber } = req.body;
     console.log(
       `Hour-wise booking request received for ${name}, ${pincode}, date: ${date}, from ${start}:00 to ${end}:00`
@@ -130,7 +130,7 @@ const parkingLotsController = {
 
     try {
       let data = await ParkingLotModel.findOne({ name, pincode });
-   
+
       if (!data) {
         console.log("Parking lot not found");
         return res.status(404).send("Parking lot not found");
@@ -161,7 +161,6 @@ const parkingLotsController = {
         let hourwiseBookingFlag = lot.bookingsHourWise.findIndex(
           (booking) => booking.date === date
         );
-
 
         if (hourwiseBookingFlag === -1) {
           console.log("hourwiseBookingFlag: ", hourwiseBookingFlag);
@@ -233,7 +232,6 @@ const parkingLotsController = {
     const { name, pincode, bookingNumber } = req.body;
 
     try {
-      
       const lot = await ParkingLotModel.findOne({ name, pincode });
 
       if (!lot) {
@@ -243,13 +241,10 @@ const parkingLotsController = {
 
       let lotFound = false;
 
-      
       for (let i = 0; i < lot.lots.length; i++) {
         const currentLot = lot.lots[i];
 
-       
         if (currentLot.iotbooking && !currentLot.occupied) {
-          
           currentLot.occupied = true;
           currentLot.bookings.push({
             bookingNumber: bookingNumber,
@@ -271,7 +266,6 @@ const parkingLotsController = {
           .send("No available IoT lots or all IoT lots are occupied.");
       }
 
-   
       lot.markModified("lots");
       await lot.save();
       return lot.lotNo;
@@ -311,7 +305,6 @@ const parkingLotsController = {
 
           lot.markModified("lots");
 
-    
           await lot.save();
           console.log("Data successfully saved.");
           console.log("IoT booking successful, lot number:", lotNo);
@@ -340,7 +333,12 @@ const parkingLotsController = {
   },
 
   registerParkingLot: async (req, res) => {
-    const { phoneNumber, name, maxCapacity, occupancy, pincode } = req.body;
+    const { phoneNumber,  email } = req.body;
+    const { ownerId } = req.owner;
+    const { lots } = req.body;
+    
+   for (let i = 0; i < lots.length; i++) {
+    const { name, pincode, maxCapacity } = lots[i];
     console.log(
       `Registering parking lot: ${name}, ${pincode}, max capacity: ${maxCapacity}`
     );
@@ -367,11 +365,13 @@ const parkingLotsController = {
 
     let data = {
       ownerPhoneNumber: phoneNumber,
+      ownerEmail: email,
       name: name,
       maxCapacity: maxCapacity,
-      occupancy: occupancy,
+      occupancy: 0,
       pincode: pincode,
       lots: space,
+      ownerId: ownerId,
     };
 
     try {
@@ -381,79 +381,180 @@ const parkingLotsController = {
       res.status(201).send(result);
     } catch (error) {
       console.error("Error registering parking lot:", error);
-      res.status(500).send(error);
+      if (!res.headersSent) {
+        res.status(500).send("Server error");
+      }
     }
+  }
   },
   removeBookingFromIot: async (req, res) => {
     console.log(req.body);
     const { name, pincode, bookingNumber, Lotno, model } = req.body;
 
     try {
-        const lot = await ParkingLotModel.findOne({ name, pincode });
-        if (!lot) {
-            console.log("Parking lot not found");
-            return res.status(404).send("Parking lot not found");
-        }
+      const lot = await ParkingLotModel.findOne({ name, pincode });
+      if (!lot) {
+        console.log("Parking lot not found");
+        return res.status(404).send("Parking lot not found");
+      }
 
-        console.log(`Removing booking from Lotno: ${Lotno}`);
-        let bookedLot = lot.lots.find(lot => lot.lotNo == Lotno);
+      console.log(`Removing booking from Lotno: ${Lotno}`);
+      let bookedLot = lot.lots.find((lot) => lot.lotNo == Lotno);
 
-        if (!bookedLot) {
-            console.log("Lot not found");
-            return res.status(404).send("Lot not found");
-        }
+      if (!bookedLot) {
+        console.log("Lot not found");
+        return res.status(404).send("Lot not found");
+      }
 
-        let index;
-        if (model === "iot") {
-            index = bookedLot.bookings.findIndex(booking => booking.bookingNumber === bookingNumber);
-            if (index !== -1) {
-                bookedLot.bookings.splice(index, 1);
-            } else {
-                console.log("Booking not found in IoT bookings");
-                return res.status(404).send("Booking not found in IoT bookings");
-            }
-        } else if (model === "date") {
-            index = bookedLot.bookingsDateWise.findIndex(booking => booking.bookingNumber === bookingNumber);
-            if (index !== -1) {
-                bookedLot.bookingsDateWise.splice(index, 1);
-            } else {
-                console.log("Booking not found in datewise bookings");
-                return res.status(404).send("Booking not found in datewise bookings");
-            }
-        } else if (model === "hours") {
-            index = bookedLot.bookingsHourWise.findIndex(booking => booking.bookingNumber === bookingNumber);
-            if (index !== -1) {
-                bookedLot.bookingsHourWise.splice(index, 1);
-            } else {
-                console.log("Booking not found in hourwise bookings");
-                return res.status(404).send("Booking not found in hourwise bookings");
-            }
+      let index;
+      if (model === "iot") {
+        index = bookedLot.bookings.findIndex(
+          (booking) => booking.bookingNumber === bookingNumber
+        );
+        if (index !== -1) {
+          bookedLot.bookings.splice(index, 1);
         } else {
-          console.log(model);
-            console.log("Invalid model type");
-            return res.status(400).send("Invalid model type");
+          console.log("Booking not found in IoT bookings");
+          return res.status(404).send("Booking not found in IoT bookings");
         }
-
-       
-        if (model === "iot" && bookedLot.bookings.length === 0) {
-            bookedLot.occupied = false;
-        } else if (bookedLot.bookingsDateWise.length === 0 && bookedLot.bookingsHourWise.length === 0) {
-            bookedLot.occupied = false;
+      } else if (model === "date") {
+        index = bookedLot.bookingsDateWise.findIndex(
+          (booking) => booking.bookingNumber === bookingNumber
+        );
+        if (index !== -1) {
+          bookedLot.bookingsDateWise.splice(index, 1);
+        } else {
+          console.log("Booking not found in datewise bookings");
+          return res.status(404).send("Booking not found in datewise bookings");
         }
+      } else if (model === "hours") {
+        index = bookedLot.bookingsHourWise.findIndex(
+          (booking) => booking.bookingNumber === bookingNumber
+        );
+        if (index !== -1) {
+          bookedLot.bookingsHourWise.splice(index, 1);
+        } else {
+          console.log("Booking not found in hourwise bookings");
+          return res.status(404).send("Booking not found in hourwise bookings");
+        }
+      } else {
+        console.log(model);
+        console.log("Invalid model type");
+        return res.status(400).send("Invalid model type");
+      }
 
-      
-        lot.markModified('lots');
+      if (model === "iot" && bookedLot.bookings.length === 0) {
+        bookedLot.occupied = false;
+      } else if (
+        bookedLot.bookingsDateWise.length === 0 &&
+        bookedLot.bookingsHourWise.length === 0
+      ) {
+        bookedLot.occupied = false;
+      }
 
-        await lot.save();
-        console.log("Booking removed successfully");
-        return res.status(200).send("Booking removed successfully");
+      lot.markModified("lots");
 
+      await lot.save();
+      console.log("Booking removed successfully");
+      return res.status(200).send("Booking removed successfully");
     } catch (error) {
-        console.error("Error removing booking:", error);
-        return res.status(500).send("Server error");
+      console.error("Error removing booking:", error);
+      return res.status(500).send("Server error");
     }
-},
-
+  },
+   setLotData : async (req, res) => {
+    console.log(req.body);
+    try {
+      const { user, phoneNumber } = req.user;
+      const { name } = req.body;
+  
+      // Await Redis get method and parse the result
+      let lotData = await redis.get(user);
+      if (lotData) {
+        // If lotData is found in Redis, return it immediately
+        return res.status(200).send(JSON.parse(lotData));
+      }
+  
+      lotData = await ParkingLotModel.findOne({
+        ownerPhoneNumber: phoneNumber,
+        ownerEmail: user,
+        name: name,
+      });
+      console.log(lotData);
+      let counts = {
+        onlineBookingLotsAndOccupied: 0,
+        iotBookingLotsAndOccupied: 0,
+        onlineBookingLotsAndNotOccupied: 0,
+        iotBookingLotsAndNotOccupied: 0,
+      };
+  
+      if (lotData) {
+        counts.onlineBookingLotsAndOccupied = lotData.lots.filter(
+          (lot) => lot.occupied === true && lot.iotbooking === false
+        ).length;
+        
+        counts.onlineBookingLotsAndNotOccupied = lotData.lots.filter(
+          (lot) => lot.occupied === false && lot.iotbooking === false
+        ).length;
+  
+        counts.iotBookingLotsAndOccupied = lotData.lots.filter(
+          (lot) => lot.occupied === true && lot.iotbooking === true
+        ).length;
+  
+        counts.iotBookingLotsAndNotOccupied = lotData.lots.filter(
+          (lot) => lot.occupied === false && lot.iotbooking === true
+        ).length;
+         console.log(counts);
+        // Set the counts object to Redis
+        await redis.set(user, JSON.stringify(counts), 'EX', 600);
+      }
+      
+      return res.status(200).send(counts);
+    } catch (error) {
+      console.log(error);
+      return res.status(500).send({ error: "Internal server error" });
+    }
+  },
+  
+  
+   hadelLotDataCashe :async (req, res) => {
+    console.log(req.body);
+    try {
+      const { user, phoneNumber } = req.user;
+      let email=user;
+      
+      // Await Redis get method and parse the result
+      let lotData = await redis.get(email);
+      if (lotData) {
+        lotData = JSON.parse(lotData);
+        const { lotValueToUpdate, value } = req.body;
+        
+        if (lotValueToUpdate === "onlineBookingLotsAndOccupied") {
+          lotData.onlineBookingLotsAndOccupied = (lotData.onlineBookingLotsAndOccupied || 0) + value;
+          lotData.onlineBookingLotsAndNotOccupied = (lotData.onlineBookingLotsAndNotOccupied || 0) - value;
+        } else if (lotValueToUpdate === "iotBookingLotsAndOccupied") {
+          lotData.iotBookingLotsAndOccupied = (lotData.iotBookingLotsAndOccupied || 0) + value;
+          lotData.iotBookingLotsAndNotOccupied = (lotData.iotBookingLotsAndNotOccupied || 0) - value;
+        } else if (lotValueToUpdate === "onlineBookingLotsAndNotOccupied") {
+          lotData.onlineBookingLotsAndNotOccupied = (lotData.onlineBookingLotsAndNotOccupied || 0) + value;
+          lotData.onlineBookingLotsAndOccupied = (lotData.onlineBookingLotsAndOccupied || 0) - value;
+        } else if (lotValueToUpdate === "iotBookingLotsAndNotOccupied") {
+          lotData.iotBookingLotsAndNotOccupied = (lotData.iotBookingLotsAndNotOccupied || 0) + value;
+          lotData.iotBookingLotsAndOccupied = (lotData.iotBookingLotsAndOccupied || 0) - value;
+        }
+        
+        // Set the updated object to Redis
+        await redis.set(email, JSON.stringify(lotData), 'EX', 600);
+        return res.status(200).send(lotData);
+      } else {
+        // If data is not found in Redis, set the data
+        return parkingLotsController.setLotData(req, res);
+      }
+    } catch (error) {
+      console.log(error);
+      return res.status(500).send({ error: "Internal server error" });
+    }
+  }
+  
 };
-
 export default parkingLotsController;

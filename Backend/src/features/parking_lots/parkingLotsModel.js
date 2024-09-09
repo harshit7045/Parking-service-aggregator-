@@ -40,6 +40,17 @@ const parkingLotSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  ownerEmail: {
+
+    type: String,
+    required: true
+
+    
+  },
+  ownerId:{
+    type: String,
+    required: true
+  },
   currentOccupancy: {
     type: Number,
     default: 0

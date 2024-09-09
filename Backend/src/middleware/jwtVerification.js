@@ -2,7 +2,7 @@ import pkg from 'jsonwebtoken';
 const { verify } = pkg;
 
 const authMiddleware = (req, res, next) => {
-  //console.log(req.headers);
+ 
   const token = req.headers['authorization'];
 
   if (!token) {
