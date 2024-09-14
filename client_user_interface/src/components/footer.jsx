@@ -1,17 +1,17 @@
 import React from "react";
 import "@fontsource/poppins"; // Import Poppins font
-import aImage from '../assets/images/Screenshot 2024-07-22 015322.png';
+import aImage from '../assets/images/footerimage.png';
 export default function Footer() {
     return (
         <>
           
-          <section class="py-10 bg-[#d3d3d3] sm:pt-16 lg:pt-24">
+          <section class="py-10 bg-[#15202a] sm:pt-16 lg:pt-24v mt-[5vh]">
     <div class="px-4 mx-auto sm:px-6 lg:px-8 max-w-7xl">
         <div class="grid grid-cols-2 md:col-span-3 lg:grid-cols-6 gap-y-16 gap-x-12">
             <div class="col-span-2 md:col-span-3 lg:col-span-2 lg:pr-8">
                 <img class="w-auto h-7" src={ aImage} alt="" />
 
-                <p class="text-base leading-relaxed text-gray-600 mt-7">ParkEase is a parking lot aggregator offering RFID-based check-in, billing, online booking, and secure parking services.</p>
+                <p class="text-lg leading-relaxed text-[#6a6b6d] font-bold mt-7">ParkEase is a parking lot aggregator offering RFID-based check-in, billing, online booking, and secure parking services.</p>
 
                 <ul class="flex items-center space-x-3 mt-9">
                     <li>
@@ -59,66 +59,66 @@ export default function Footer() {
             </div>
 
             <div>
-                <p class="text-sm font-semibold tracking-widest text-gray-400 uppercase">Company</p>
+                <p class="text-sm  tracking-widest text-white font-bold uppercase">Company</p>
 
                 <ul class="mt-6 space-y-4">
                     <li>
-                        <a href="#" title="" class="flex text-base text-black transition-all duration-200 hover:text-blue-600 focus:text-blue-600"> About </a>
+                        <a href="#" title="" class="flex font-semibold text-base  text-[#6a6b6d] transition-all duration-200 hover:text-blue-600 focus:text-blue-600"> About </a>
                     </li>
 
                     <li>
-                        <a href="#" title="" class="flex text-base text-black transition-all duration-200 hover:text-blue-600 focus:text-blue-600"> Features </a>
+                        <a href="#" title="" class="flex  font-semibold text-base   text-[#6a6b6d] transition-all duration-200 hover:text-blue-600 focus:text-blue-600"> Features </a>
                     </li>
 
                     <li>
-                        <a href="#" title="" class="flex text-base text-black transition-all duration-200 hover:text-blue-600 focus:text-blue-600"> Works </a>
+                        <a href="#" title="" class="flex  font-semibold text-base   text-[#6a6b6d] transition-all duration-200 hover:text-blue-600 focus:text-blue-600"> Works </a>
                     </li>
 
                     <li>
-                        <a href="#" title="" class="flex text-base text-black transition-all duration-200 hover:text-blue-600 focus:text-blue-600"> Career </a>
+                        <a href="#" title="" class="flex font-semibold text-base    text-[#6a6b6d] transition-all duration-200 hover:text-blue-600 focus:text-blue-600"> Career </a>
                     </li>
                 </ul>
             </div>
 
             <div>
-                <p class="text-sm font-semibold tracking-widest text-gray-400 uppercase">Help</p>
+                <p class="text-sm font-semibold tracking-widest  text-white font-bold uppercase">Help</p>
 
                 <ul class="mt-6 space-y-4">
                     <li>
-                        <a href="#" title="" class="flex text-base text-black transition-all duration-200 hover:text-blue-600 focus:text-blue-600"> Customer Support </a>
+                        <a href="#" title="" class="flex font-semibold text-base    text-[#6a6b6d] transition-all duration-200 hover:text-blue-600 focus:text-blue-600"> Customer Support </a>
                     </li>
 
                     <li>
-                        <a href="#" title="" class="flex text-base text-black transition-all duration-200 hover:text-blue-600 focus:text-blue-600"> Delivery Details </a>
+                        <a href="#" title="" class="flex  font-semibold text-base   text-[#6a6b6d] transition-all duration-200 hover:text-blue-600 focus:text-blue-600"> Delivery Details </a>
                     </li>
 
                     <li>
-                        <a href="#" title="" class="flex text-base text-black transition-all duration-200 hover:text-blue-600 focus:text-blue-600"> Terms & Conditions </a>
+                        <a href="#" title="" class="flex  font-semibold text-base   text-[#6a6b6d] transition-all duration-200 hover:text-blue-600 focus:text-blue-600"> Terms & Conditions </a>
                     </li>
 
                     <li>
-                        <a href="#" title="" class="flex text-base text-black transition-all duration-200 hover:text-blue-600 focus:text-blue-600"> Privacy Policy </a>
+                        <a href="#" title="" class="flex  font-semibold text-base   text-[#6a6b6d] transition-all duration-200 hover:text-blue-600 focus:text-blue-600"> Privacy Policy </a>
                     </li>
                 </ul>
             </div>
 
             <div class="col-span-2 md:col-span-1 lg:col-span-2 lg:pl-8">
-                <p class="text-sm font-semibold tracking-widest text-gray-400 uppercase">Subscribe to newsletter</p>
+                <p class="text-sm font-semibold tracking-widest  text-white font-bold uppercase">Subscribe to newsletter</p>
 
                 <form action="#" method="POST" class="mt-6">
                     <div>
                         <label for="email" class="sr-only">Email</label>
-                        <input type="email" name="email" id="email" placeholder="Enter your email" class="block w-full p-4 text-black placeholder-gray-500 transition-all duration-200 bg-white border border-gray-200 rounded-md focus:outline-none focus:border-blue-600 caret-blue-600" />
+                        <input type="email" name="email" id="email" placeholder="Enter your email" class="block w-full p-4 text-[#6a6b6d] placeholder-gray-500 transition-all duration-200 bg-white border border-gray-200 rounded-md focus:outline-none focus:border-blue-600 caret-blue-600" />
                     </div>
 
-                    <button type="submit" class="inline-flex items-center justify-center px-6 py-4 mt-3 font-semibold text-white transition-all duration-200 bg-[#b16163] rounded-md hover:bg-blue-700 focus:bg-blue-700">Subscribe</button>
+                    <button type="submit" class="inline-flex items-center justify-center px-6 py-4 mt-3 font-semibold text-white transition-all duration-200 bg-[#16d445] rounded-md hover:bg-blue-700 focus:bg-blue-700">Subscribe</button>
                 </form>
             </div>
         </div>
 
         <hr class="mt-16 mb-10 border-gray-200" />
 
-        <p class="text-sm text-center text-gray-600">© Copyright 2021, All Rights Reserved by ParkEase</p>
+        <p class="text-sm text-center  text-white font-bold">© Copyright 2021, All Rights Reserved by ParkEase</p>
     </div>
 </section>
 

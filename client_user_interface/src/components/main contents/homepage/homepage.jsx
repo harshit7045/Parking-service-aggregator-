@@ -1,106 +1,41 @@
 import React from "react";
 import "@fontsource/poppins";
 import Features from "./features";
-import AvilableLots from "./avilablelots";
+import AvilableLots from "./avilablelots"; // Keeping the typo here
 import Services from "./services";
 import { useNavigate } from "react-router-dom";
-const backgroundImageStyle = {
-  position: 'relative',
-  width: '100vw',
-  minHeight: '60vh',  // Corrected min-height to minHeight
-  overflow: 'hidden',
-};
-
-const blurredBackgroundStyle = {
-  content: '""',
-  position: 'absolute',
-  top: 0,
-  left: 0,
-  right: 0,
-  bottom: 0,
-  backgroundImage: `url(https://th.bing.com/th/id/OIP.RO_-RWKYnbTxQawo9N12ggAAAA?rs=1&pid=ImgDetMain)`,
-  backgroundSize: 'cover',
-  backgroundPosition: 'center',
-  filter: 'blur(0.2rem)',
-  zIndex: -1,
-};
-
-const textStyle = {
-  color: '#030303',
-  fontSize: '60px',
-  fontWeight: 700,
-  fontFamily: 'Poppins',
-  textAlign: 'center',
-  padding: '5vh 5vw',
-  zIndex: 1,
-  position: 'relative',
-};
-
-const inputContainerStyle = {
-  display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center',
-  marginTop: '2rem',
-  zIndex: 1,
-  position: 'relative',
-};
-
-const inputStyle = {
-  padding: '1rem',
-  fontSize: '16px',
-  borderRadius: '5px',
-  border: '1px solid #ccc',
-  marginRight: '1rem',
-};
-
-const buttonStyle = {
-  padding: '1rem 2rem',
-  fontSize: '16px',
-  borderRadius: '5px',
-  border: 'none',
-  backgroundColor: '#b16163',
-  color: 'white',
-  cursor: 'pointer',
-};
-
-const subtitleStyle = {
-  color: '#030303',
-  fontSize: '20px',
-  fontFamily: 'Poppins',
-  textAlign: 'center',
-  marginTop: '2rem',
-  zIndex: 1,
-  position: 'relative',
-};
 
 export default function Homepage() {
-  const nagivate=useNavigate()
+  const navigate = useNavigate();
+
   const handleJoin = () => {
-    nagivate('/register');
+    navigate('/register');
   }
+
   return (
     <>
-      <div style={backgroundImageStyle}>
-        <div style={blurredBackgroundStyle}></div>
-        <div style={textStyle}>
-          Discover convenient parking solutions for<br /> your everyday journeys.
+      <div className="relative w-full min-h-[60vh] bg-cover bg-center bg-[url('https://i.pinimg.com/originals/ae/9e/1e/ae9e1e27a5317b7d99da700de61c1e3b.jpg')]">
+        <div className="absolute inset-0 bg-black/40"></div>
+        <div className="relative z-10 text-white text-2xl md:text-4xl font-bold font-poppins text-center py-10 px-6 md:py-20 md:px-8">
+          Discover convenient parking solutions for your everyday journeys.
         </div>
-        <div style={inputContainerStyle}>
+        <div className="relative z-10 flex flex-col laptop:flex-row justify-center items-center mt-8 px-4 laptop:px-8">
           <input
             type="text"
             placeholder="Enter your email to join"
-            style={inputStyle}
-            className="w-[50vw]"
+            className="p-4 text-base border rounded-md border-gray-300 mb-4 laptop:mb-0 laptop:mr-4 w-full laptop:w-[50vw]"
           />
-          <button onClick={handleJoin} style={buttonStyle}>Join</button>
+          <button onClick={handleJoin} className="p-4 text-base rounded-md bg-[#16d445] text-white cursor-pointer laptop:ml-4">
+            Join
+          </button>
         </div>
-        <div style={subtitleStyle}>
+        <div className="relative z-10 text-white text-sm laptop:text-xl font-poppins text-center mt-4 laptop:mt-8">
           Book parking spaces hassle-free at the best rates available.
         </div>
       </div>
       <Features />
-      <AvilableLots />
-      <Services />
+      <AvilableLots /> {/* Keeping the typo here */}
+     <Services />
     </>
   );
 }

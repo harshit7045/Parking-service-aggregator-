@@ -59,7 +59,7 @@ async function sendexitEmail(receiverEmail, emailData,data) {
     }
 }
 async function sendEmail(receiverEmail,data) {
-    const navigate = useNavigate();
+    
     try {
         // Create a transporter with Gmail SMTP settings
         let transporter = nodemailer.createTransport({

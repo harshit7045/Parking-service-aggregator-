@@ -1,11 +1,13 @@
-import React from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
 import "@fontsource/poppins"; // Import Poppins font
 
 export default function Header() {
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
     const navigate = useNavigate();
     const token = Cookies.get("token");
+    const menuRef = useRef(null);
 
     const handleButtonClick = () => {
         if (token) {
@@ -13,92 +15,88 @@ export default function Header() {
         } else {
             navigate("/login");
         }
+        setIsMenuOpen(false); // Close menu on navigation
     };
 
     const handleBookNow = () => {
         navigate("/booklot");
+        setIsMenuOpen(false); // Close menu on navigation
     };
 
     const homepage = () => {
         navigate("/");
+        setIsMenuOpen(false); // Close menu on navigation
     };
 
+    // Close menu when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (menuRef.current && !menuRef.current.contains(event.target)) {
+                setIsMenuOpen(false);
+            }
+        };
+
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, []);
+
     return (
-        <>
-            <div className="min-h-[8vh] w-[100vw] shadow-xl px-[2vw] flex items-center">
-                <div
-                    onClick={homepage}
-                    className="text-[#030303] font-poppins text-[40px] font-bold not-italic normal-case no-underline text-left custom-font clickable"
+        <header className="relative min-h-[8vh] w-full shadow-xl px-4 bg-[#15202a] md:px-8 flex items-center justify-between">
+            <div
+                onClick={homepage}
+                className="text-[#ffffff] font-poppins text-[40px] font-bold cursor-pointer"
+            >
+                ParkEase
+            </div>
+
+            {/* Hamburger Menu */}
+            <div className="md:hidden flex items-center">
+                <button 
+                    onClick={() => setIsMenuOpen(!isMenuOpen)}
+                    className="text-[#ffffff] text-2xl focus:outline-none"
                 >
-                    ParkEase
+                    ☰
+                </button>
+            </div>
+
+            {/* Desktop Menu */}
+            <div className="hidden md:flex ml-auto items-center  space-x-4">
+                <div
+                    className="text-[#ffffff] mr-[10vw] font-sans text-[28px] font-normal cursor-pointer"
+                    onClick={handleBookNow}
+                >
+                    Find Parking
                 </div>
-                <div className="flex ml-[50vw] justify-evenly items-center w-[50vw] h-[100]">
-                    <div className="find-parking clickable" onClick={handleBookNow}>
+                <div
+                    className="font-poppins text-[#ffffff] border-solid border-2 bg-[#1690d3] border-[#030303] shadow-xl px-8 py-2 flex justify-center items-center cursor-pointer font-medium text-[20px]"
+                    onClick={handleButtonClick}
+                >
+                    {token ? "Profile" : "Login"}
+                </div>
+            </div>
+
+            {/* Mobile Menu */}
+            {isMenuOpen && (
+                <div 
+                    ref={menuRef}
+                    className="fixed top-0 right-0 w-[70vw] h-screen bg-white shadow-lg border border-gray-300 z-50 flex flex-col items-center py-8 space-y-4"
+                >
+                    <div
+                        className="w-full text-center text-[#030303] font-sans text-[24px] font-normal cursor-pointer py-4 border-b border-gray-200 hover:bg-gray-100 transition-colors"
+                        onClick={handleBookNow}
+                    >
                         Find Parking
                     </div>
                     <div
-                        className="font-poppins login border-solid border-2 border-[#030303] shadow-xl px-8 py-.5 flex justify-center items-center cursor-pointer clickable"
+                        className="w-full text-center text-[#030303] font-poppins text-[24px] font-medium cursor-pointer py-4 border-b border-gray-200 hover:bg-gray-100 transition-colors"
                         onClick={handleButtonClick}
                     >
                         {token ? "Profile" : "Login"}
                     </div>
                 </div>
-            </div>
-            <style jsx>{`
-                .custom-font {
-                    font-variant: no-common-ligatures;
-                    font-kerning: auto;
-                    font-optical-sizing: auto;
-                    font-stretch: 100%;
-                    font-variation-settings: normal;
-                    font-feature-settings: normal;
-                }
-
-                .find-parking {
-                    color: #030303;
-                    font-family: 'Gelion', Helvetica, 'Helvetica Neue', Arial, sans-serif;
-                    font-size: 28px;
-                    font-weight: 400;
-                    font-style: normal;
-                    font-variant: no-common-ligatures;
-                    font-kerning: auto;
-                    font-optical-sizing: auto;
-                    font-stretch: 100%;
-                    font-variation-settings: normal;
-                    font-feature-settings: normal;
-                    text-transform: none;
-                    text-decoration: none solid rgb(3, 3, 3);
-                    text-align: start;
-                    text-indent: 0px;
-                }
-
-                .login {
-                    color: #030303;
-                    font-size: 20px;
-                    font-weight: 500;
-                    font-style: normal;
-                    font-variant: no-common-ligatures;
-                    font-kerning: auto;
-                    font-optical-sizing: auto;
-                    font-stretch: 100%;
-                    font-variation-settings: normal;
-                    font-feature-settings: normal;
-                    text-transform: none;
-                    text-decoration: none solid rgb(3, 3, 3);
-                    text-align: start;
-                    text-indent: 0px;
-                }
-
-                .clickable {
-                    cursor: pointer;
-                    transition: transform 0.2s ease-in-out;
-                    user-select: none; /* Prevent text selection */
-                }
-
-                .clickable:hover {
-                    transform: scale(1.05); /* Slightly increase size on hover */
-                }
-            `}</style>
-        </>
+            )}
+        </header>
     );
 }

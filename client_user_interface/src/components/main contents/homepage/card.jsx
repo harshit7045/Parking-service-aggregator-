@@ -12,14 +12,14 @@ const buttonStyle = {
   fontSize: '16px',
   borderRadius: '5px',
   border: 'none',
-  backgroundColor: '#b16163',
+  backgroundColor: '#16d445',
   color: 'white',
   cursor: 'pointer',
 };
 
 const textStyle = {
   color: '#030303',
-  fontSize: '16px',
+  fontSize: '20px',
   fontWeight: 500,
   fontStyle: 'normal',
   textTransform: 'none',
@@ -29,7 +29,7 @@ const textStyle = {
 
 const headingStyle = {
   color: '#030303',
-  fontSize: '12px',
+  fontSize: '16px',
   fontWeight: 700,
   fontStyle: 'normal',
   textTransform: 'none',
@@ -45,12 +45,29 @@ export default function ImgMediaCard({ title, description, image }) {
   };
 
   return (
-    <Card sx={{ minWidth: 250, maxWidth: 250, backgroundColor: '#d3d3d3', margin: '5vh', fontFamily: 'Poppins' }}>
-      <CardMedia 
+    <Card
+      sx={{
+        minWidth: "18vw",
+        maxWidth: 250,
+        backgroundColor: '#f3f4f6',
+        margin: '5vh',
+        fontFamily: 'Poppins',
+        boxShadow: '0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)'
+      }}
+    >
+      <CardMedia
+        sx={{
+          
+          width: '100%',
+          // Media query for tablets and smaller
+          '@media (max-width: 768px)': {
+            width: 0,
+            height: 0,
+          },
+        }}
         component="img"
         alt={title}
-        height="140"
-        image={image} 
+        image={image}
       />
       <CardContent>
         <Typography gutterBottom variant="h5" component="div" sx={textStyle}>
@@ -61,7 +78,9 @@ export default function ImgMediaCard({ title, description, image }) {
         </Typography>
       </CardContent>
       <CardActions>
-        <Button size="small" sx={buttonStyle} onClick={handleBookNow}>Book</Button>
+        <Button size="small" sx={buttonStyle} onClick={handleBookNow}>
+          Book
+        </Button>
       </CardActions>
     </Card>
   );

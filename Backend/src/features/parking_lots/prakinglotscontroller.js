@@ -92,6 +92,7 @@ const parkingLotsController = {
           endTime: endDate,
           bookingNumber: bookingNumber,
         });
+        lot.occupied=true;
 
         lotFound = true;
         bookedLotNo = lot.lotNo;
@@ -173,6 +174,7 @@ const parkingLotsController = {
             time,
             bookingNumber: bookingNumber,
           });
+          lot.occupied = true;
           console.log(
             `No previous hour bookings found for date ${date}. Creating new time slots.`
           );
@@ -465,11 +467,11 @@ const parkingLotsController = {
    setLotData : async (req, res) => {
     console.log(req.body);
     try {
-      const { user, phoneNumber } = req.user;
+      const { user, phoneNumber,ownerId } = req.user;
       const { name } = req.body;
   
       // Await Redis get method and parse the result
-      let lotData = await redis.get(user);
+      let lotData = await redis.get(ownerId);
       if (lotData) {
         // If lotData is found in Redis, return it immediately
         return res.status(200).send(JSON.parse(lotData));
@@ -506,7 +508,7 @@ const parkingLotsController = {
         ).length;
          console.log(counts);
         // Set the counts object to Redis
-        await redis.set(user, JSON.stringify(counts), 'EX', 600);
+        await redis.set(ownerId55555555555555555555555555555555555555555555, JSON.stringify(counts), 'EX', 600);
       }
       
       return res.status(200).send(counts);
@@ -520,11 +522,11 @@ const parkingLotsController = {
    hadelLotDataCashe :async (req, res) => {
     console.log(req.body);
     try {
-      const { user, phoneNumber } = req.user;
+      const { user, phoneNumber,ownerId } = req.user;
       let email=user;
       
       // Await Redis get method and parse the result
-      let lotData = await redis.get(email);
+      let lotData = await redis.get(ownerId);
       if (lotData) {
         lotData = JSON.parse(lotData);
         const { lotValueToUpdate, value } = req.body;
@@ -544,7 +546,7 @@ const parkingLotsController = {
         }
         
         // Set the updated object to Redis
-        await redis.set(email, JSON.stringify(lotData), 'EX', 600);
+        await redis.set(ownerId, JSON.stringify(lotData), 'EX', 600);
         return res.status(200).send(lotData);
       } else {
         // If data is not found in Redis, set the data
@@ -554,7 +556,75 @@ const parkingLotsController = {
       console.log(error);
       return res.status(500).send({ error: "Internal server error" });
     }
-  }
-  
+  },
+  makeOneLotIotBooking: async (req, res) => {
+    try {
+        const { ownerId } = req.user;
+        const { name, pincode } = req.body;
+        let lotData = await ParkingLotModel.findOne({
+            ownerId: ownerId,
+            name: name,
+            pincode: pincode
+        });
+
+        if (!lotData) {
+            return res.status(404).send({ error: "Parking lot not found" });
+        }
+
+        
+        let lotUpdated = false;
+        for (let i = 0; i < lotData.lots.length; i++) {
+            if (lotData.lots[i].occupied === false && lotData.lots[i].iotbooking === false) {
+                lotData.lots[i].iotbooking = true;
+                lotUpdated = true;
+                break;
+            }
+        }
+
+        if (!lotUpdated) {
+            return res.status(400).send({ error: "No available lot for onspot booking consverion" });
+        }
+
+       
+        await lotData.save();
+
+        return res.status(200).send(lotData);
+    } catch (error) {
+        console.error("Error booking IoT lot:", error);
+        return res.status(500).send({ error: "Internal server error" });
+    }
+},
+makeOneLotOnlineBooking: async (req, res) => {
+    try {
+        const { ownerId } = req.user;
+        const { name, pincode } = req.body;
+        let lotData = await ParkingLotModel.findOne({
+            ownerId: ownerId,
+            name: name,
+            pincode: pincode
+        });
+        if (!lotData) {
+
+            return res.status(404).send({ error: "Parking lot not found" });
+        }
+        let lotUpdated = false;
+        for (let i = 0; i < lotData.lots.length; i++) {
+            if (lotData.lots[i].occupied === false && lotData.lots[i].iotbooking === true) {
+                lotData.lots[i].iotbooking = false;
+                lotUpdated = true;
+                break;
+            }
+        }
+        if (!lotUpdated) {
+            return res.status(400).send({ error: "No available lot for onspot booking consverion" });
+        }
+        await lotData.save();
+        return res.status(200).send(lotData);
+    } catch (error) {
+        console.error("Error booking online lot:", error);
+        return res.status(500).send({ error: "Internal server error" });
+    } 
+},
+
 };
 export default parkingLotsController;
