@@ -6,7 +6,7 @@ import SimpleAlert from "../homepage/alertbox";
 import BasicSelect from "./dropdown";
 import img from "../../../assets/images/background.png";
 import hp from "../../../assets/images/OIP.jpeg";
-
+import { useRef } from "react";
 const alertBarStyle = {
   width: "100%",
   zIndex: 1,
@@ -47,7 +47,7 @@ function ParkingLot() {
     message: "",
     severity: "",
   });
-
+const targetRef=useRef(null);
   const handleModelChange = (newModel) => {
     setModel(newModel);
   };
@@ -116,6 +116,11 @@ function ParkingLot() {
       });
       console.error("Error fetching parking lots:", error);
     }
+    if (targetRef.current) {
+      targetRef.current.scrollIntoView({ behavior: "smooth" });
+    } else {
+      console.log("Target element not found");
+    }
   };
 
   const handleBookNow = (lot) => {
@@ -176,9 +181,9 @@ function ParkingLot() {
             </div>
           </div>
         </div>
-        <div className="bg-white flex flex-col mt-[10vh] justify-center">
+        <div className="bg-white flex flex-col  mt-[10vh] justify-center">
           {/* Parking Lots Section */}
-          <h1 className="text-4xl font-semibold m-[5rem] mb-4 flex justify-center">
+          <h1 className="text-4xl  font-semibold m-[5rem] mb-4 flex justify-center" ref={targetRef}>
             Available Parking Lots on the given Pincode
           </h1>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 m-[5rem] mb-[10vh] mt-[10vh]">
@@ -229,8 +234,8 @@ function ParkingLot() {
                 secure parking spaces. Find a spot in seconds and ensure a
                 hassle-free parking experience.
               </p>
-              <button className="bg-green-500 text-white py-3 px-8 rounded-lg hover:bg-green-600 transition">
-                Find Parking Options
+              <button className="bg-green-500 text-white py-3 px-8 rounded-lg hover:bg-green-600 transition" onClick={handleSearch}>
+                Enter Pincode above to search on map
               </button>
             </div>
           </div>

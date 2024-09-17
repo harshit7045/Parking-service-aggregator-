@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { ReactComponent as CctvIcon } from '../../../assets/images/valet-head-svgrepo-com.svg'; // Replace with actual icon paths
+import { ReactComponent as CctvIcon } from '../../../assets/images/'; // Replace with actual icon paths
 import { ReactComponent as CarIcon } from '../../../assets/images/valet-head-svgrepo-com.svg';
 import { ReactComponent as KeyIcon } from '../../../assets/images/valet-head-svgrepo-com.svg';
 import { ReactComponent as MapIcon } from '../../../assets/images/valet-head-svgrepo-com.svg';

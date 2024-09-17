@@ -1,8 +1,8 @@
 import React from 'react';
-import { ReactComponent as CctvIcon } from '../../../assets/images/valet-head-svgrepo-com.svg'; 
-import { ReactComponent as CarIcon } from '../../../assets/images/valet-head-svgrepo-com.svg';
+import { ReactComponent as CctvIcon } from '../../../assets/images/lock-hashtag-svgrepo-com.svg'; 
+import { ReactComponent as CarIcon } from '../../../assets/images/maps-and-flags-map-location-svgrepo-com.svg';
 import { ReactComponent as KeyIcon } from '../../../assets/images/valet-head-svgrepo-com.svg';
-import { ReactComponent as MapIcon } from '../../../assets/images/valet-head-svgrepo-com.svg';
+import { ReactComponent as MapIcon } from '../../../assets/images/maps-svgrepo-com.svg';
 
 const Features = () => {
     return (

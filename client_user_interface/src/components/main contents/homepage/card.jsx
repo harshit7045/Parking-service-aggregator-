@@ -42,7 +42,7 @@ export default function ImgMediaCard({ title, description, image }) {
   const token = Cookies.get("token");
   const handleBookNow = () => {
     if (token) {
-      navigate("/profile");
+      navigate("/booklot");
   } else {
       navigate("/login");
   }

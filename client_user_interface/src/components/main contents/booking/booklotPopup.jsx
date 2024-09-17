@@ -12,19 +12,21 @@ import {
   Button,
   Typography,
 } from "@mui/material";
+import { forwardRef, useRef } from "react";
 import CarImgMediaCard from "./booklotVehiclecard";
 import Cookies from "js-cookie";
 import { BasicDatePicker, hoursdate } from "./singledatePicker";
 import { useLocation } from "react-router-dom";
 import SimpleAlert from "../homepage/alertbox";
 import img from "../../../assets/images/background.png";
-const textStyle = "text-[#030303] text-[30px] font-bold font-[Poppins] text-left py-[2vh] px-[2vw] relative z-[1] flex justify-center ";
+const textStyle =
+  "text-[#030303] text-[30px] font-bold font-[Poppins] text-left py-[2vh] px-[2vw] relative z-[1] flex justify-center ";
 
-const UserProfile = ({ dat }) => {
+  const UserProfile = React.forwardRef(({ dat }, ref) => {
   const [vehicles, setVehicles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
+  
   useEffect(() => {
     async function fetchData() {
       try {
@@ -46,26 +48,24 @@ const UserProfile = ({ dat }) => {
   if (error) return <div>{error}</div>;
 
   return (
-    <div className="vehicle-list">
-      <div  className={textStyle}>
-        Your Vehicles
-      </div>
+    <div className="vehicle-list " ref={ref}>
+      <div className={textStyle}>Your Vehicles</div>
       <div className="flex-row flex flex-wrap justify-center lg:p-[5rem]">
         {vehicles.map((vehicle) => (
           <div className="m-[5vw]">
-          <CarImgMediaCard
-            key={vehicle.uniqueIdentification}
-            title={vehicle.uniqueIdentification}
-            description={vehicle.category}
-            image="https://plus.unsplash.com/premium_photo-1661956487605-1544bcd9b29e?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8Y2FyJTIwaW4lMjBwYXJraW5nfGVufDB8fDB8fHww"
-            data={dat} // Pass the updated dat
-          />
+            <CarImgMediaCard
+              key={vehicle.uniqueIdentification}
+              title={vehicle.uniqueIdentification}
+              description={vehicle.category}
+              image="https://plus.unsplash.com/premium_photo-1661956487605-1544bcd9b29e?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8Y2FyJTIwaW4lMjBwYXJraW5nfGVufDB8fDB8fHww"
+              data={dat} 
+            />
           </div>
         ))}
       </div>
     </div>
   );
-};
+});
 
 export default function Bookingform() {
   const location = useLocation();
@@ -73,12 +73,13 @@ export default function Bookingform() {
   const [bookingType, setBookingType] = useState(model); // 'date' or 'time'
   const [dialogOpen, setDialogOpen] = useState(false);
   const navigate = useNavigate();
+  const targetRef = useRef(null);
   useEffect(() => {
-    const token = Cookies.get('token'); // Check if token exists
+    const token = Cookies.get("token"); 
     if (!token) {
-      navigate('/login'); // Redirect to login if no token
+      navigate("/login"); 
     }
-  }, [navigate]); 
+  }, [navigate]);
   const [dat, setDat] = useState({
     name: parkingLotName,
     pincode: pincode,
@@ -104,15 +105,20 @@ export default function Bookingform() {
     setDialogOpen(true);
     console.log("Booking Details:");
     console.log(dat.bookingModel);
+    if (targetRef.current) {
+      targetRef.current.scrollIntoView({ behavior: "smooth" });
+    } else {
+      console.log("Target element not found");
+    }
   };
 
   const handleDialogClose = () => {
     setDialogOpen(false);
   };
- console.log(bookingType);
+  console.log(bookingType);
   return (
     <>
-    <div
+      <div
         className="w-full h-[400px] bg-cover bg-center bg-no-repeat flex justify-center items-center"
         style={{ backgroundImage: `url(${img})` }}
       >
@@ -122,60 +128,62 @@ export default function Bookingform() {
         </div>
       </div>
       <div className="bg-[#ffffff] m-[2.5vw] card">
-      
+        <div className="flex flex-col items-center justify-center">
+          {/* Parking Lot Information Header */}
 
-      <div className="flex flex-col items-center justify-center">
-  {/* Parking Lot Information Header */}
- 
+          {/* Parking Lot Information Card */}
+          <div className="w-full max-w-[40vw] flex flex-col items-center mt-[-9vh]">
+            {/* Profile Image */}
+            <div className="w-24 h-24 mb-4">
+              <img
+                src="https://www.carscoops.com/wp-content/uploads/2018/10/ee694fa4-classic-recreations-boss-429.jpg"
+                alt="Parking Lot"
+                className="w-full h-full object-cover rounded-full border border-gray-300"
+              />
+            </div>
+            <div className="text-2xl font-bold mb-6">Parking Lot Details</div>
 
-  {/* Parking Lot Information Card */}
-  <div className="w-full max-w-[40vw] flex flex-col items-center mt-[-9vh]">
-    {/* Profile Image */}
-    <div className="w-24 h-24 mb-4">
-      <img
-        src="https://www.carscoops.com/wp-content/uploads/2018/10/ee694fa4-classic-recreations-boss-429.jpg"
-        alt="Parking Lot"
-        className="w-full h-full object-cover rounded-full border border-gray-300"
-      />
-    </div>
-    <div className="text-2xl font-bold mb-6">Parking Lot Details</div>
-
-    {/* Information Table */}
-    <table className="table-auto w-full max-w-md border-collapse border border-gray-300">
-      <tbody>
-        <tr className="border-b  border-gray-300">
-          <td className="px-4 py-2 text-lg font-semibold text-gray-700">
-            Parking Lot Name
-          </td>
-          <td className="px-4 py-2 text-gray-600">{parkingLotName}</td>
-        </tr>
-        <tr className="border-b border-gray-300">
-          <td className="px-4 py-2 text-lg font-semibold text-gray-700">
-            Pincode
-          </td>
-          <td className="px-4 py-2 text-gray-600">{pincode}</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-</div>
-
+            {/* Information Table */}
+            <table className="table-auto w-full max-w-md border-collapse border border-gray-300">
+              <tbody>
+                <tr className="border-b  border-gray-300">
+                  <td className="px-4 py-2 text-lg font-semibold text-gray-700">
+                    Parking Lot Name
+                  </td>
+                  <td className="px-4 py-2 text-gray-600">{parkingLotName}</td>
+                </tr>
+                <tr className="border-b border-gray-300">
+                  <td className="px-4 py-2 text-lg font-semibold text-gray-700">
+                    Pincode
+                  </td>
+                  <td className="px-4 py-2 text-gray-600">{pincode}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
 
         <div className="bg-[#f6f7f9]  rounded-2xl min-h-[40vh] mt-[5vh] border-solid border-[#b16163]">
           <div className="booking-options mb-[5vh] flex justify-evenly w-[100%]">
-            
             <Button
               variant="contained"
               onClick={() => handleBookingTypeChange("date")}
-              sx={{ backgroundColor:  bookingType === "date" ? ("#16d044"): ( "#a7f3d0"),width:"50%"
-               }}
+              sx={{
+                backgroundColor: bookingType === "date" ? "#16d044" : "#a7f3d0",
+                width: "50%",
+              }}
             >
               Book Date-wise{" "}
             </Button>
             <Button
               variant="contained"
               onClick={() => handleBookingTypeChange("hours")}
-              sx={{ backgroundColor: bookingType === "hours" ? ("#16d044"): ( "#a7f3d0"),width:"50%", height:"7vh" }}
+              sx={{
+                backgroundColor:
+                  bookingType === "hours" ? "#16d044" : "#a7f3d0",
+                width: "50%",
+                height: "7vh",
+              }}
             >
               Book Hour-wise
             </Button>
@@ -187,38 +195,49 @@ export default function Bookingform() {
           ) : bookingType === "hours" ? (
             <>
               <div className="flex flex-row justify-between flex-wrap w-[100vw] m-0 p-[2vw]">
-
                 <BasicDatePicker />
               </div>
               <div className="flex flex-row justify-center flex-wrap m-[2rem] mt-0">
                 <div className="m-[5vw] flex  flex-col justify-center">
-                  <h3 className="text-xl font-bold pl-[30%] pb-[1rem]">Check In Time</h3>
-                <StaticTimePickerLandscape label="Start Time"/>
+                  <h3 className="text-xl font-bold pl-[30%] pb-[1rem]">
+                    Check In Time
+                  </h3>
+                  <StaticTimePickerLandscape label="Start Time" />
                 </div>
                 <div className="m-[5vw]">
-                <h3 className="text-xl font-bold pl-[30%] pb-[1rem]">Check Out Time</h3>
-                <EndStaticTimePickerLandscape label="End Time" />
+                  <h3 className="text-xl font-bold pl-[30%] pb-[1rem]">
+                    Check Out Time
+                  </h3>
+                  <EndStaticTimePickerLandscape label="End Time" />
                 </div>
               </div>
             </>
           ) : (
-            <div>Not Available</div>
+            <div className="text-[2rem] m-[3rem]">
+              {" "}
+              "If you're looking to book a parking spot on the go, simply visit
+              the lot, and the system will automatically secure your spot.
+              <br />
+              However, please note that <b>no reservations</b> will be made for
+              this option.
+              <br />
+              To reserve a spot in advance, please choose either the{" "}
+              <b>hour-wise</b> or <b>date-wise</b> booking option."
+            </div>
           )}
-           {bookingType === "onthego" ? (
-           <div></div>
-          ) :  (
+          {bookingType === "onthego" ? (
+            <div></div>
+          ) : (
             <div className="lg:ml-[34vw]">
-            <Button
-            variant="contained"
-            onClick={handleOkayClick}
-            sx={{ backgroundColor: "#16d044", margin: "5rem" }}
-          >
-            Click here to finalize booking Timings
-          </Button>
-          </div>
-              
-          ) }
-         
+              <Button
+                variant="contained"
+                onClick={handleOkayClick}
+                sx={{ backgroundColor: "#16d044", margin: "5rem" }}
+              >
+                Click here to finalize booking Timings
+              </Button>
+            </div>
+          )}
         </div>
       </div>
       <Dialog open={dialogOpen} onClose={handleDialogClose}>
@@ -240,7 +259,8 @@ export default function Bookingform() {
           </Button>
         </DialogActions>
       </Dialog>
-      <UserProfile dat={dat} /> {}
+      <UserProfile ref={targetRef} dat={dat} />
+
     </>
   );
 }
