@@ -5,7 +5,7 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import Cookies from 'js-cookie';
 
 const MapWithSearch = ({ initialLocation }) => {
-  const [mapToken, setMapToken] = useState(Cookies.get('mapToken'));
+  const [mapToken, setMapToken] = useState(Cookies.get('mapToken') || '');
   const [inputValue, setInputValue] = useState('');
   const mapContainerRef = useRef();
   const mapInstanceRef = useRef();
@@ -13,39 +13,44 @@ const MapWithSearch = ({ initialLocation }) => {
 
   useEffect(() => {
     const initializeMap = async () => {
-      
+      // Set token if not available
       if (!mapToken) {
-        try {
-          const publicToken = "pk.eyJ1IjoiaGFyc2hpdDcwNDUiLCJhIjoiY2x6enFvOThqMWZ2NTJqczJoNXdkMjBudSJ9.Kc4hYzeCzu0OUY5uXM7TQA";
-          Cookies.set('mapToken', publicToken, { expires: 7 });
-          setMapToken(publicToken);
-        } catch (error) {
-          console.error("Failed to fetch token:", error);
-          return;
-        }
+        const publicToken = "pk.eyJ1IjoiaGFyc2hpdDcwNDUiLCJhIjoiY2x6enFvOThqMWZ2NTJqczJoNXdkMjBudSJ9.Kc4hYzeCzu0OUY5uXM7TQA";
+        Cookies.set('mapToken', publicToken, { expires: 7 });
+        setMapToken(publicToken);
       }
 
-      mapboxgl.accessToken = mapToken;
+      // Ensure mapToken is available before initializing the map
+      if (mapToken) {
+        mapboxgl.accessToken = mapToken;
 
-      mapInstanceRef.current = new mapboxgl.Map({
-        container: mapContainerRef.current,
-        center: initialLocation || [-74.5, 40],
-        zoom: 9,
-      });
+        mapInstanceRef.current = new mapboxgl.Map({
+          container: mapContainerRef.current,
+          center: initialLocation || [-74.5, 40],
+          zoom: 9,
+        });
 
-      mapInstanceRef.current.on('load', () => {
-        setMapLoaded(true);
-      });
+        mapInstanceRef.current.on('load', () => {
+          setMapLoaded(true);
+        });
+      }
     };
 
     initializeMap();
+
+    // Cleanup function to remove the map on component unmount
+    return () => {
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.remove();
+      }
+    };
   }, [mapToken, initialLocation]);
 
   return (
     <>
-      <div style={{ position: 'relative', height: '70vh', width: '80vw',  margin:'10vw'}}>
+      <div style={{ position: 'relative', height: '100%', width: '100%', margin: '0' }}>
         {mapLoaded && (
-          <div style={{ position: 'absolute', top: 0, width: '100%', zIndex: 1 }}>
+          <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: -1 }}>
             <SearchBox
               accessToken={mapToken}
               map={mapInstanceRef.current}

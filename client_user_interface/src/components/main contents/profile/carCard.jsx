@@ -6,7 +6,7 @@ import CardMedia from '@mui/material/CardMedia';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import { useNavigate } from 'react-router-dom';
-import Cookies from "js-cookie";
+
 const buttonStyle = {
   padding: '1rem 2rem',
   fontSize: '16px',
@@ -37,15 +37,11 @@ const headingStyle = {
   textAlign: 'start',
 };
 
-export default function ImgMediaCard({ title, description, image }) {
+export default function ImgMedia({ title, description, image }) {
   const navigate = useNavigate();
-  const token = Cookies.get("token");
+
   const handleBookNow = () => {
-    if (token) {
-      navigate("/profile");
-  } else {
-      navigate("/login");
-  }
+    navigate('/booklot');
   };
 
   return (
@@ -75,10 +71,10 @@ export default function ImgMediaCard({ title, description, image }) {
       />
       <CardContent>
         <Typography gutterBottom variant="h5" component="div" sx={textStyle}>
-           {title}
+          Vehicle No: {title}
         </Typography>
         <Typography variant="body2" color="text.secondary" sx={headingStyle}>
-          {description}
+          Vehicle Category: {description}
         </Typography>
       </CardContent>
       <CardActions>

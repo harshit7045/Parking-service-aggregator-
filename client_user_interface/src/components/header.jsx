@@ -19,7 +19,11 @@ export default function Header() {
     };
 
     const handleBookNow = () => {
-        navigate("/booklot");
+        if (token) {
+            navigate("/booklot");
+        } else {
+            navigate("/login");
+        }
         setIsMenuOpen(false); // Close menu on navigation
     };
 

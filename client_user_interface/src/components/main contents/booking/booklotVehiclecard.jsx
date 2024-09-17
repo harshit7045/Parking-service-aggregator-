@@ -9,13 +9,6 @@ import Typography from '@mui/material/Typography';
 import Cookies from 'js-cookie';
 import SimpleAlert from '../homepage/alertbox';
 
-const containerStyle = {
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-  position: 'relative',
-  paddingBottom: '2rem', // Space for the alert bar
-};
 
 const cardsStyle = {
   display: 'flex',
@@ -29,28 +22,33 @@ const alertBarStyle = {
   width: '100%',
   zIndex: 1,
 };
-
 const buttonStyle = {
   padding: '1rem 2rem',
   fontSize: '16px',
   borderRadius: '5px',
   border: 'none',
-  backgroundColor: '#D9534F',
+  backgroundColor: '#16d445',
   color: 'white',
   cursor: 'pointer',
 };
 
 const textStyle = {
   color: '#030303',
-  fontSize: '16px',
+  fontSize: '20px',
   fontWeight: 500,
+  fontStyle: 'normal',
+  textTransform: 'none',
+  textDecoration: 'none solid rgb(3, 3, 3)',
   textAlign: 'start',
 };
 
 const headingStyle = {
   color: '#030303',
-  fontSize: '12px',
+  fontSize: '16px',
   fontWeight: 700,
+  fontStyle: 'normal',
+  textTransform: 'none',
+  textDecoration: 'none solid rgb(3, 3, 3)',
   textAlign: 'start',
 };
 
@@ -103,9 +101,9 @@ export default function CarImgMediaCard({ title, description, image, data }) {
   }
 
   return (
-    <div style={containerStyle}>
+    <div style={{ margin: 'rem'}} >
       <div style={cardsStyle}>
-        <Card sx={{ minWidth: 250, maxWidth: 250, backgroundColor: '#d3d3d3', margin: '5vh', fontFamily: 'Poppins' }}>
+        <Card sx={{  }}>
           <CardMedia 
             component="img"
             alt={title}
@@ -114,10 +112,10 @@ export default function CarImgMediaCard({ title, description, image, data }) {
           />
           <CardContent>
             <Typography gutterBottom variant="h5" component="div" sx={textStyle}>
-              {title}
+             Vehicle Uid: {title}
             </Typography>
             <Typography variant="body2" color="text.secondary" sx={headingStyle}>
-              {description}
+              Category: {description}
             </Typography>
           </CardContent>
           <CardActions>
@@ -126,7 +124,7 @@ export default function CarImgMediaCard({ title, description, image, data }) {
         </Card>
       </div>
       {alertData.show && 
-        <div style={alertBarStyle}>
+        <div >
           <SimpleAlert severity={alertData.severity} message={alertData.message} />
         </div>
       }

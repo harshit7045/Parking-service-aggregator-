@@ -116,7 +116,7 @@ const RegistrationForm = () => {
   };
 
   return (
-    <div className="p-4 max-w-md mx-auto border sm:max-w-lg sm:mx-auto sm:p-8 lg:max-w-full lg:mx-0 lg:p-8">
+    <div className="p-4 max-w-md min-h-[50vh] mx-auto mb-[-5vh] sm:max-w-lg sm:mx-auto sm:p-8 lg:max-w-full lg:mx-0 lg:p-8">
       <form className="lg:w-full lg:flex lg:flex-col lg:items-center">
         <div className="mb-4 w-full">
           <label className="block text-gray-700">Email</label>
@@ -213,11 +213,11 @@ const RegistrationForm = () => {
             </div>
           </div>
         ))}
-        <div className="flex text-center justify-center w-full">
+        <div className="flex  text-center justify-center w-full">
           <button
             type="button"
             onClick={registerUser}
-            className="px-4 py-2 bg-[#b16163] text-white font-bold rounded"
+            className="px-4 py-2 h-[5vh] min-w-[20vw] bg-[#16d044] text-white flex justify-center items-center font-bold rounded"
           >
             Register
           </button>

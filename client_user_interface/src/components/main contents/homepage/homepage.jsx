@@ -1,7 +1,7 @@
 import React from "react";
 import "@fontsource/poppins";
 import Features from "./features";
-import AvilableLots from "./avilablelots"; // Keeping the typo here
+import AvilableLots from "./avilablelots"; 
 import Services from "./services";
 import { useNavigate } from "react-router-dom";
 
@@ -22,7 +22,7 @@ export default function Homepage() {
         <div className="relative z-10 flex flex-col laptop:flex-row justify-center items-center mt-8 px-4 laptop:px-8">
           <input
             type="text"
-            placeholder="Enter your email to join"
+            placeholder="Enter email to sign up"
             className="p-4 text-base border rounded-md border-gray-300 mb-4 laptop:mb-0 laptop:mr-4 w-full laptop:w-[50vw]"
           />
           <button onClick={handleJoin} className="p-4 text-base rounded-md bg-[#16d445] text-white cursor-pointer laptop:ml-4">

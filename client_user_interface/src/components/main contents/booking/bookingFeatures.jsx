@@ -1,12 +1,13 @@
+
 import React from 'react';
-import { ReactComponent as CctvIcon } from '../../../assets/images/valet-head-svgrepo-com.svg'; 
+import { ReactComponent as CctvIcon } from '../../../assets/images/valet-head-svgrepo-com.svg'; // Replace with actual icon paths
 import { ReactComponent as CarIcon } from '../../../assets/images/valet-head-svgrepo-com.svg';
 import { ReactComponent as KeyIcon } from '../../../assets/images/valet-head-svgrepo-com.svg';
 import { ReactComponent as MapIcon } from '../../../assets/images/valet-head-svgrepo-com.svg';
 
-const Features = () => {
+const Bookingfeatures = () => {
     return (
-        <div id="features" className="bg-gray-100 py-8 flex justify-center min-h-[40vh]">
+        <div id="features" className="bg-white py-8 flex justify-center min-h-[40vh]">
             <div className="container place-items-center  grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 min-w-[90vw]">
 
 
@@ -67,4 +68,4 @@ const Features = () => {
     );
 };
 
-export default Features;
+export default Bookingfeatures;

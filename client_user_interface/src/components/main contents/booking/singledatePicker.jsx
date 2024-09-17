@@ -37,7 +37,7 @@ function BasicDatePicker() {
             
             
           }}
-          label="Please select the date in which you want to book Hours Wise"
+          label="Please select booking date"
           onChange={(value) => {
             // Convert the date to Indian Standard Time (IST)
             const dateInTimezone = dayjs(value).tz('Asia/Kolkata');
