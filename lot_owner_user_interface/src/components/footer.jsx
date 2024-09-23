@@ -105,7 +105,7 @@ export default function Footer() {
             <div class="col-span-2 md:col-span-1 lg:col-span-2 lg:pl-8">
                 <p class="text-sm font-semibold tracking-widest  text-white font-bold uppercase">Subscribe to newsletter</p>
 
-                <form action="/register" method="GET" class="mt-6">
+                <form action="#" method="POST" class="mt-6">
                     <div>
                         <label for="email" class="sr-only">Email</label>
                         <input type="email" name="email" id="email" placeholder="Enter your email" class="block w-full p-4 text-[#6a6b6d] placeholder-gray-500 transition-all duration-200 bg-white border border-gray-200 rounded-md focus:outline-none focus:border-blue-600 caret-blue-600" />

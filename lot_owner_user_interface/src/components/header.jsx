@@ -52,14 +52,14 @@ export default function Header() {
                 onClick={homepage}
                 className="text-[#ffffff] font-poppins text-[40px] font-bold cursor-pointer"
             >
-                ParkEase
+                ParkEase Business
             </div>
 
             {/* Hamburger Menu */}
             <div className="md:hidden flex items-center">
                 <button 
                     onClick={() => setIsMenuOpen(!isMenuOpen)}
-                    className="text-[#16d044] text-2xl focus:outline-none"
+                    className=" text-2xl focus:outline-none text-[#16d044] "
                 >
                     ☰
                 </button>
@@ -71,7 +71,7 @@ export default function Header() {
                     className="text-[#ffffff] mr-[10vw] font-sans text-[28px] font-normal cursor-pointer"
                     onClick={handleBookNow}
                 >
-                    Find Parking
+                    View Your Lots
                 </div>
                 <div
                     className="font-poppins text-[#ffffff] border-solid border-2 bg-[#1690d3] border-[#030303] shadow-xl px-8 py-2 flex justify-center items-center cursor-pointer font-medium text-[20px]"
@@ -91,7 +91,7 @@ export default function Header() {
                         className="w-full text-center text-[#030303] font-sans text-[24px] font-normal cursor-pointer py-4 border-b border-gray-200 hover:bg-gray-100 transition-colors"
                         onClick={handleBookNow}
                     >
-                        Find Parking
+                        View Your Lots
                     </div>
                     <div
                         className="w-full text-center text-[#030303] font-poppins text-[24px] font-medium cursor-pointer py-4 border-b border-gray-200 hover:bg-gray-100 transition-colors"

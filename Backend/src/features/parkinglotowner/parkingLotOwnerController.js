@@ -34,7 +34,22 @@ const parkingLotOwnerController = {
         const token = sign({ user: result.email, phoneNumber: result.phoneNumber, ownerId: result.ownerId }, process.env.SECRET_KEY, {expiresIn:"7d"});
         res.cookie("tokenOwner", token, { httpOnly: false, secure: false, sameSite:'none' }).status(200).send({ message: "Login Success", user: result, token: token }) 
       } else {
-        res.status(404).send("User not found");
+        res.status(404).send({ message: "User not found" });
+      }
+    } catch (error) {
+      res.status(500).send(error);
+    }
+  },
+  getownerprofile: async (req, res) => {
+    console.log("dddd");
+    
+    try {
+      let ownerId=req.user.ownerId;
+      const result = await parkingLotOwnerModel.findOne({ ownerId: ownerId });
+      res.status(200).send({ user: result });
+      console.log(result);
+      if(!result){
+        res.status(404).send({ message: "User not found" });
       }
     } catch (error) {
       res.status(500).send(error);
