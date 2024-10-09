@@ -6,7 +6,7 @@ import "@fontsource/poppins"; // Import Poppins font
 export default function Header() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const navigate = useNavigate();
-    const token = Cookies.get("token");
+    const token = Cookies.get("ownertoken");
     const menuRef = useRef(null);
 
     const handleButtonClick = () => {

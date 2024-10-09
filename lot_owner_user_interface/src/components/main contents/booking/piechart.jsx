@@ -1,20 +1,24 @@
 import * as React from 'react';
 import { PieChart } from '@mui/x-charts/PieChart';
 
-export default function BasicPie() {
+export default function BasicPie({ serverMessage }) {
+  console.log(serverMessage);
+
+  const data = [
+    { id: 0, value: serverMessage.onlineBookingLotsAndOccupied, label: 'online lots and occupied'  },
+    { id: 1, value: serverMessage.iotBookingLotsAndOccupied, label: 'iot lots and occupied' },
+    { id: 2, value: serverMessage.onlineBookingLotsAndNotOccupied, label: 'online lots and not occupied' },
+    { id: 3, value: serverMessage.iotBookingLotsAndNotOccupied, label: 'iot lots and not occupied' },
+  ].filter(d => d.value > 0); // Filter out slices with a value of 0
+
   return (
-    <PieChart 
+    <PieChart
       series={[
         {
-          data: [
-            { id: 0, value: 10, label: 'series A' },
-            { id: 1, value: 15, label: 'series B' },
-            { id: 2, value: 20, label: 'series C' },
-            { id: 3, value: 20, label: 'series d' },
-          ],
+          data,
         },
       ]}
-      sx={{ width: "100%", height: "100%" }}
+      sx={{ width: '100%', height: '100%' }}
     />
   );
 }

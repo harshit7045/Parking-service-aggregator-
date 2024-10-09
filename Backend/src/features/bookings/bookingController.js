@@ -7,6 +7,7 @@ let x = bookingModel;
 
 const bookingController = {
   createBookingIot: async (req, res) => {
+    console.log("createBookingIot:");
     const { name, pincode, vehicleUid } = req.body;
     const bookingNumber = uuidv4();
 
@@ -45,18 +46,19 @@ const bookingController = {
           startTime: new Date().toISOString(),
         },
       };
-
       const booking = new bookingModel(bookingData);
       const result = await booking.save();
 
       if (!result) {
+        console.error("Error creating booking:", error);
         if (!res.headersSent) {
           return res
             .status(500)
             .send("An error occurred while creating the booking.");
         }
       }
-
+     
+      //parkingLotsController.hadelLotDataCashe(changeReq,res);
       return res.status(200).send(result);
     } catch (error) {
       console.error("Error creating booking:", error);

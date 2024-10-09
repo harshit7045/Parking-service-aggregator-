@@ -4,7 +4,7 @@ import { sendEmail } from "../../utils/nodeMailer.js";
 
 const iotController = {
   iotbooking: async (req, res) => {
-    console.log("IOT booking request received - Message: " + req.body.message);
+    //console.log("IOT booking request received - Message: " + req.body.message);
 
   
     const newReq = {
@@ -26,7 +26,7 @@ const iotController = {
       }
     }
 
-    console.log("Bookings found:", bookings);
+    //console.log("Bookings found:", bookings);
 
     let bookingFound = false;
     const now = new Date();
@@ -73,11 +73,11 @@ const iotController = {
           const bookingStartTime = new Date(startTimeString);
           const bookingEndTime = new Date(endTimeString);
 
-          console.log(
-            "dddd  " + currentDate,
-            bookingEndTime.toTimeString(),
-            bookingStartTime.toTimeString()
-          );
+          // //console.log(
+          //   "dddd  " + currentDate,
+          //   bookingEndTime.toTimeString(),
+          //   bookingStartTime.toTimeString()
+          // );
           if (
             now.toDateString() === bookingDate.toDateString() &&
             now >= bookingStartTime &&
@@ -177,7 +177,7 @@ const iotController = {
             bookingModel: {
               model: "iot",
             },
-            name: "ram", 
+            name: "Parking Lot A", 
           },
           user: {
             user: user.email,

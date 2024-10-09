@@ -1,8 +1,7 @@
 import express from 'express';
 import http from 'http';
 import { Server } from 'socket.io';
-
-
+import socketRegister from './utils/socketregister.js';
 const socketApp = express();
 socketApp.use(express.json());
 const socketServer = http.createServer(socketApp);
@@ -15,7 +14,22 @@ const io = new Server(socketServer, {
 
 io.on('connection', (socket) => {
     console.log('Socket connected', socket.id);
+    
+    
+    socket.on('userConnected', async ({ ownerToken, socketId }) => {
+        
+        console.log(`User connected with ownerToken: ${ownerToken}, socketId: ${socketId}`);
+        let lotData= await socketRegister(socketId, ownerToken);
+        socket.emit('lotData', lotData);
+    });
+
+    
+    // Handle socket disconnect
+    socket.on('disconnect', () => {
+        console.log('User disconnected', socket.id);
+    });
 });
-
-export default socketServer;
-
+function emitToSpecificSocket(socketId, event, data) {
+    io.to(socketId).emit(event, data); // Send the event with data to the specific socket ID
+  }
+export  {socketServer,emitToSpecificSocket};

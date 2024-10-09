@@ -11,9 +11,7 @@ import {
   Navigate
 } from "react-router-dom";
 
-// Make sure to call `loadStripe` outside of a component’s render to avoid
-// recreating the `Stripe` object on every render.
-// This is your test secret API key.
+
 const stripePromise = loadStripe("pk_test_51PosA3H35XY8u0JzOYqafQzcmDFPIRl2cWXDIyAjyy8GnIuHSrpSVnHbhwgXWKfPqcRcgkWVosp4PxtYXDiYS5Lp00ZUWcBz4P");
 
 const CheckoutForm = () => {

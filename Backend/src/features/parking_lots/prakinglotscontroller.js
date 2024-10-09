@@ -1,5 +1,7 @@
 import ParkingLotModel from "./parkingLotsModel.js";
 import redis from "../../db/redis.js";
+import { emitToSpecificSocket } from "../../socket.js";
+
 function isDateBetween(dateToCheck, startDate, endDate) {
   const date = new Date(dateToCheck);
   const start = new Date(startDate);
@@ -92,7 +94,7 @@ const parkingLotsController = {
           endTime: endDate,
           bookingNumber: bookingNumber,
         });
-        lot.occupied=true;
+        lot.occupied = true;
 
         lotFound = true;
         bookedLotNo = lot.lotNo;
@@ -115,6 +117,19 @@ const parkingLotsController = {
         message: "Booking successful",
         lotNo: bookedLotNo,
       });
+      let changeReq = {
+        user: {
+          ownerId: data.ownerId,
+          user: data.ownerEmail,
+        },
+        body: {
+          lotValueToUpdate: "onlineBookingLotsAndOccupied",
+          value: 1,
+        },
+      };
+      console.log("dsddd");
+      await parkingLotsController.hadelLotDataCashe(changeReq, res);
+
       return bookedLotNo;
     } catch (error) {
       console.error("Error during booking:", error);
@@ -224,6 +239,18 @@ const parkingLotsController = {
         message: "Booking successful",
         lotNo: bookedLotNo,
       });
+      let changeReq = {
+        user: {
+          ownerId: data.ownerId,
+          user: data.ownerEmail,
+        },
+        body: {
+          lotValueToUpdate: "onlineBookingLotsAndOccupied",
+          value: 1,
+        },
+      };
+      console.log("dsddd");
+      await parkingLotsController.hadelLotDataCashe(changeReq, res);
       return bookedLotNo;
     } catch (error) {
       console.error("Error during booking:", error);
@@ -252,7 +279,7 @@ const parkingLotsController = {
             bookingNumber: bookingNumber,
             startTime: new Date().toISOString(),
           });
-
+          
           lotFound = true;
           console.log(`IoT booking successful for lot ${currentLot.lotNo}.`);
           break;
@@ -267,7 +294,7 @@ const parkingLotsController = {
           .status(409)
           .send("No available IoT lots or all IoT lots are occupied.");
       }
-
+      
       lot.markModified("lots");
       await lot.save();
       return lot.lotNo;
@@ -286,7 +313,7 @@ const parkingLotsController = {
 
     try {
       const lot = await ParkingLotModel.findOne({ name, pincode });
-
+      
       if (!lot) {
         console.log("Parking lot not found");
         return res.status(404).send("Parking lot not found");
@@ -310,7 +337,20 @@ const parkingLotsController = {
           await lot.save();
           console.log("Data successfully saved.");
           console.log("IoT booking successful, lot number:", lotNo);
+          let changeReq = {
+            user: {
+              ownerId: lot.ownerId,
+              user: lot.ownerEmail,
+            },
+            body: {
+              lotValueToUpdate: "iotBookingLotsAndOccupied",
+              value: 1,
+            },
+          };
+          console.log("dsddd");
+          await parkingLotsController.hadelLotDataCashe(changeReq, res);
           return lotNo;
+
           return res.status(200).send({
             message: "IoT booking successful",
             lotNo: lotNo,
@@ -335,59 +375,59 @@ const parkingLotsController = {
   },
 
   registerParkingLot: async (req, res) => {
-    const { phoneNumber,  email } = req.body;
+    const { phoneNumber, email } = req.body;
     const { ownerId } = req.owner;
     const { lots } = req.body;
-    
-   for (let i = 0; i < lots.length; i++) {
-    const { name, pincode, maxCapacity } = lots[i];
-    console.log(
-      `Registering parking lot: ${name}, ${pincode}, max capacity: ${maxCapacity}`
-    );
 
-    let space = [];
-    for (let i = 0; i < maxCapacity; i++) {
-      if (i < maxCapacity / 2) {
-        space.push({
-          lotNo: i + 1,
-          occupied: false,
-          bookingsDateWise: [],
-          bookingsHourWise: [],
-          iotbooking: false,
-        });
-      } else {
-        space.push({
-          lotNo: i + 1,
-          occupied: false,
-          bookings: [],
-          iotbooking: true,
-        });
+    for (let i = 0; i < lots.length; i++) {
+      const { name, pincode, maxCapacity } = lots[i];
+      console.log(
+        `Registering parking lot: ${name}, ${pincode}, max capacity: ${maxCapacity}`
+      );
+
+      let space = [];
+      for (let i = 0; i < maxCapacity; i++) {
+        if (i < maxCapacity / 2) {
+          space.push({
+            lotNo: i + 1,
+            occupied: false,
+            bookingsDateWise: [],
+            bookingsHourWise: [],
+            iotbooking: false,
+          });
+        } else {
+          space.push({
+            lotNo: i + 1,
+            occupied: false,
+            bookings: [],
+            iotbooking: true,
+          });
+        }
+      }
+
+      let data = {
+        ownerPhoneNumber: phoneNumber,
+        ownerEmail: email,
+        name: name,
+        maxCapacity: maxCapacity,
+        occupancy: 0,
+        pincode: pincode,
+        lots: space,
+        ownerId: ownerId,
+      };
+
+      try {
+        const parkingLot = new ParkingLotModel(data);
+        const result = await parkingLot.save();
+        console.log("Parking lot registered successfully:", result);
+        res.status(201).send(result);
+      } catch (error) {
+        console.error("Error registering parking lot:", error);
+        if (!res.headersSent) {
+          res.status(500).send("Server error");
+        }
       }
     }
-
-    let data = {
-      ownerPhoneNumber: phoneNumber,
-      ownerEmail: email,
-      name: name,
-      maxCapacity: maxCapacity,
-      occupancy: 0,
-      pincode: pincode,
-      lots: space,
-      ownerId: ownerId,
-    };
-
-    try {
-      const parkingLot = new ParkingLotModel(data);
-      const result = await parkingLot.save();
-      console.log("Parking lot registered successfully:", result);
-      res.status(201).send(result);
-    } catch (error) {
-      console.error("Error registering parking lot:", error);
-      if (!res.headersSent) {
-        res.status(500).send("Server error");
-      }
-    }
-  }
   },
   removeBookingFromIot: async (req, res) => {
     console.log(req.body);
@@ -419,6 +459,22 @@ const parkingLotsController = {
           console.log("Booking not found in IoT bookings");
           return res.status(404).send("Booking not found in IoT bookings");
         }
+        try {
+          let changeReq = {
+            user: {
+              ownerId: lot.ownerId,
+              user: lot.ownerEmail,
+            },
+            body: {
+              lotValueToUpdate: "iotBookingLotsAndNotOccupied",
+              value: 1,
+            },
+          };
+          console.log("dsddd");
+          await parkingLotsController.hadelLotDataCashe(changeReq, res);
+        } catch (error) {
+          console.log(error);
+        }
       } else if (model === "date") {
         index = bookedLot.bookingsDateWise.findIndex(
           (booking) => booking.bookingNumber === bookingNumber
@@ -429,6 +485,22 @@ const parkingLotsController = {
           console.log("Booking not found in datewise bookings");
           return res.status(404).send("Booking not found in datewise bookings");
         }
+        try {
+          let changeReq = {
+            user: {
+              ownerId: lot.ownerId,
+              user: lot.ownerEmail,
+            },
+            body: {
+              lotValueToUpdate: "onlineBookingLotsAndNotOccupied",
+              value: 1,
+            },
+          };
+          console.log("dsddd");
+          await parkingLotsController.hadelLotDataCashe(changeReq, res);
+        } catch (error) {
+          console.log(error);
+        }
       } else if (model === "hours") {
         index = bookedLot.bookingsHourWise.findIndex(
           (booking) => booking.bookingNumber === bookingNumber
@@ -438,6 +510,22 @@ const parkingLotsController = {
         } else {
           console.log("Booking not found in hourwise bookings");
           return res.status(404).send("Booking not found in hourwise bookings");
+        }
+        try {
+          let changeReq = {
+            user: {
+              ownerId: lot.ownerId,
+              user: lot.ownerEmail,
+            },
+            body: {
+              lotValueToUpdate: "onlineBookingLotsAndNotOccupied",
+              value: 1,
+            },
+          };
+          console.log("dsddd");
+          await parkingLotsController.hadelLotDataCashe(changeReq, res);
+        } catch (error) {
+          console.log(error);
         }
       } else {
         console.log(model);
@@ -464,17 +552,17 @@ const parkingLotsController = {
       return res.status(500).send("Server error");
     }
   },
-   setLotData : async (req, res) => {
+  setLotData: async (req, res) => {
     console.log(req.body);
     try {
-      const { user, phoneNumber,ownerId } = req.user;
+      const { user, phoneNumber, ownerId } = req.user;
       const { name } = req.body;
   
       // Await Redis get method and parse the result
       let lotData = await redis.get(ownerId);
       if (lotData) {
         // If lotData is found in Redis, return it immediately
-        return res.status(200).send(JSON.parse(lotData));
+        return JSON.parse(lotData);  // This is fine because lotData is likely a string
       }
   
       lotData = await ParkingLotModel.findOne({
@@ -494,7 +582,7 @@ const parkingLotsController = {
         counts.onlineBookingLotsAndOccupied = lotData.lots.filter(
           (lot) => lot.occupied === true && lot.iotbooking === false
         ).length;
-        
+  
         counts.onlineBookingLotsAndNotOccupied = lotData.lots.filter(
           (lot) => lot.occupied === false && lot.iotbooking === false
         ).length;
@@ -506,143 +594,173 @@ const parkingLotsController = {
         counts.iotBookingLotsAndNotOccupied = lotData.lots.filter(
           (lot) => lot.occupied === false && lot.iotbooking === true
         ).length;
-         console.log(counts);
+  
         // Set the counts object to Redis
-        await redis.set(ownerId, JSON.stringify(counts), 'EX', 600);
+        await redis.set(ownerId, JSON.stringify(counts), "EX", 600);
       }
-      
-      return res.status(200).send(counts);
+      console.log("ss" + counts);
+      // Return the counts object directly
+      return counts;  // No need to use JSON.parse here
     } catch (error) {
       console.log(error);
-      return res.status(500).send({ error: "Internal server error" });
+      return error;
     }
   },
   
-  
-   hadelLotDataCashe :async (req, res) => {
-    console.log(req.body);
+
+  hadelLotDataCashe: async (req, res) => {
+    console.log("aa");
     try {
-      const { user, phoneNumber,ownerId } = req.user;
-      let email=user;
-      
+      const { user, phoneNumber, ownerId } = req.user;
+      let email = user;
+
       // Await Redis get method and parse the result
       let lotData = await redis.get(ownerId);
       if (lotData) {
+        // Parse the Redis data if it's a string
         lotData = JSON.parse(lotData);
         const { lotValueToUpdate, value } = req.body;
-        
+
+        // Update lotData properties based on the lotValueToUpdate
         if (lotValueToUpdate === "onlineBookingLotsAndOccupied") {
-          lotData.onlineBookingLotsAndOccupied = (lotData.onlineBookingLotsAndOccupied || 0) + value;
-          lotData.onlineBookingLotsAndNotOccupied = (lotData.onlineBookingLotsAndNotOccupied || 0) - value;
+          lotData.onlineBookingLotsAndOccupied =
+            (lotData.onlineBookingLotsAndOccupied || 0) + value;
+          lotData.onlineBookingLotsAndNotOccupied =
+            (lotData.onlineBookingLotsAndNotOccupied || 0) - value;
         } else if (lotValueToUpdate === "iotBookingLotsAndOccupied") {
-          lotData.iotBookingLotsAndOccupied = (lotData.iotBookingLotsAndOccupied || 0) + value;
-          lotData.iotBookingLotsAndNotOccupied = (lotData.iotBookingLotsAndNotOccupied || 0) - value;
+          lotData.iotBookingLotsAndOccupied =
+            (lotData.iotBookingLotsAndOccupied || 0) + value;
+          lotData.iotBookingLotsAndNotOccupied =
+            (lotData.iotBookingLotsAndNotOccupied || 0) - value;
         } else if (lotValueToUpdate === "onlineBookingLotsAndNotOccupied") {
-          lotData.onlineBookingLotsAndNotOccupied = (lotData.onlineBookingLotsAndNotOccupied || 0) + value;
-          lotData.onlineBookingLotsAndOccupied = (lotData.onlineBookingLotsAndOccupied || 0) - value;
+          lotData.onlineBookingLotsAndNotOccupied =
+            (lotData.onlineBookingLotsAndNotOccupied || 0) + value;
+          lotData.onlineBookingLotsAndOccupied =
+            (lotData.onlineBookingLotsAndOccupied || 0) - value;
         } else if (lotValueToUpdate === "iotBookingLotsAndNotOccupied") {
-          lotData.iotBookingLotsAndNotOccupied = (lotData.iotBookingLotsAndNotOccupied || 0) + value;
-          lotData.iotBookingLotsAndOccupied = (lotData.iotBookingLotsAndOccupied || 0) - value;
+          lotData.iotBookingLotsAndNotOccupied =
+            (lotData.iotBookingLotsAndNotOccupied || 0) + value;
+          lotData.iotBookingLotsAndOccupied =
+            (lotData.iotBookingLotsAndOccupied || 0) - value;
         }
         
-        // Set the updated object to Redis
-        await redis.set(ownerId, JSON.stringify(lotData), 'EX', 600);
-        return res.status(200).send(lotData);
+        // Get socket ID and emit updated lotData to the specific socket
+        const socketId = await redis.hget(email, "socketId");
+        console.log(lotData);
+        console.log(socketId + user);
+        emitToSpecificSocket(socketId, "lotData", lotData);
+
+        // Set the updated object to Redis and send a response
+        await redis.set(ownerId, JSON.stringify(lotData), "EX", 600);
+        //return res.status(200).send(lotData);
       } else {
-        // If data is not found in Redis, set the data
-        return parkingLotsController.setLotData(req, res);
+        // If lotData is not found in Redis, set the data
+        let newLotData = parkingLotsController.setLotData(req, res);
+        const socketId = await redis.hget(user, "socketId");
+        console.log(newLotData);
+        console.log(socketId + user);
+        emitToSpecificSocket(socketId, "lotData", newLotData);
+
+        // Return the new lotData and set it in Redis
+        await redis.set(ownerId, JSON.stringify(newLotData), "EX", 600);
+        //return res.status(200).send(newLotData);
       }
+    } catch (error) {
+      console.error("Error in hadelLotDataCashe:", error);
+      return res.status(500).send({ error: "Internal server error" });
+    }
+  },
+
+  makeOneLotIotBooking: async (req, res) => {
+    try {
+      const { ownerId } = req.user;
+      const { name, pincode } = req.body;
+      let lotData = await ParkingLotModel.findOne({
+        ownerId: ownerId,
+        name: name,
+        pincode: pincode,
+      });
+
+      if (!lotData) {
+        return res.status(404).send({ error: "Parking lot not found" });
+      }
+
+      let lotUpdated = false;
+      for (let i = 0; i < lotData.lots.length; i++) {
+        if (
+          lotData.lots[i].occupied === false &&
+          lotData.lots[i].iotbooking === false
+        ) {
+          lotData.lots[i].iotbooking = true;
+          lotUpdated = true;
+          break;
+        }
+      }
+
+      if (!lotUpdated) {
+        return res
+          .status(400)
+          .send({ error: "No available lot for onspot booking consverion" });
+      }
+
+      await lotData.save();
+
+      return res.status(200).send(lotData);
+    } catch (error) {
+      console.error("Error booking IoT lot:", error);
+      return res.status(500).send({ error: "Internal server error" });
+    }
+  },
+  makeOneLotOnlineBooking: async (req, res) => {
+    try {
+      const { ownerId } = req.user;
+      const { name, pincode } = req.body;
+      let lotData = await ParkingLotModel.findOne({
+        ownerId: ownerId,
+        name: name,
+        pincode: pincode,
+      });
+      if (!lotData) {
+        return res.status(404).send({ error: "Parking lot not found" });
+      }
+      let lotUpdated = false;
+      for (let i = 0; i < lotData.lots.length; i++) {
+        if (
+          lotData.lots[i].occupied === false &&
+          lotData.lots[i].iotbooking === true
+        ) {
+          lotData.lots[i].iotbooking = false;
+          lotUpdated = true;
+          break;
+        }
+      }
+      if (!lotUpdated) {
+        return res
+          .status(400)
+          .send({ error: "No available lot for onspot booking consverion" });
+      }
+      await lotData.save();
+      return res.status(200).send(lotData);
+    } catch (error) {
+      console.error("Error booking online lot:", error);
+      return res.status(500).send({ error: "Internal server error" });
+    }
+  },
+  findParkingLotbyOwnerid: async (req, res) => {
+    console.log(req.user);
+    console.log("bbb");
+    try {
+      const { ownerId } = req.user;
+      const result = await ParkingLotModel.find({ ownerId: ownerId });
+      console.log(result);
+      if (!result) {
+        return res.status(404).send({ error: "Parking lot not found" });
+      }
+      return res.status(200).send(result);
     } catch (error) {
       console.log(error);
       return res.status(500).send({ error: "Internal server error" });
     }
   },
-  makeOneLotIotBooking: async (req, res) => {
-    try {
-        const { ownerId } = req.user;
-        const { name, pincode } = req.body;
-        let lotData = await ParkingLotModel.findOne({
-            ownerId: ownerId,
-            name: name,
-            pincode: pincode
-        });
-
-        if (!lotData) {
-            return res.status(404).send({ error: "Parking lot not found" });
-        }
-
-        
-        let lotUpdated = false;
-        for (let i = 0; i < lotData.lots.length; i++) {
-            if (lotData.lots[i].occupied === false && lotData.lots[i].iotbooking === false) {
-                lotData.lots[i].iotbooking = true;
-                lotUpdated = true;
-                break;
-            }
-        }
-
-        if (!lotUpdated) {
-            return res.status(400).send({ error: "No available lot for onspot booking consverion" });
-        }
-
-       
-        await lotData.save();
-
-        return res.status(200).send(lotData);
-    } catch (error) {
-        console.error("Error booking IoT lot:", error);
-        return res.status(500).send({ error: "Internal server error" });
-    }
-},
-makeOneLotOnlineBooking: async (req, res) => {
-    try {
-        const { ownerId } = req.user;
-        const { name, pincode } = req.body;
-        let lotData = await ParkingLotModel.findOne({
-            ownerId: ownerId,
-            name: name,
-            pincode: pincode
-        });
-        if (!lotData) {
-
-            return res.status(404).send({ error: "Parking lot not found" });
-        }
-        let lotUpdated = false;
-        for (let i = 0; i < lotData.lots.length; i++) {
-            if (lotData.lots[i].occupied === false && lotData.lots[i].iotbooking === true) {
-                lotData.lots[i].iotbooking = false;
-                lotUpdated = true;
-                break;
-            }
-        }
-        if (!lotUpdated) {
-            return res.status(400).send({ error: "No available lot for onspot booking consverion" });
-        }
-        await lotData.save();
-        return res.status(200).send(lotData);
-    } catch (error) {
-        console.error("Error booking online lot:", error);
-        return res.status(500).send({ error: "Internal server error" });
-    } 
-},
-findParkingLotbyOwnerid: async (req, res) => {
-  console.log(req.user);
-  console.log("bbb")
-    try {
-        const { ownerId } = req.user;
-        const result = await ParkingLotModel.find({ ownerId: ownerId });
-        console.log(result);
-        if(!result){
-            return res.status(404).send({ error: "Parking lot not found" });
-        }
-        return res.status(200).send(result);
-    } catch (error) {
-        console.log(error);
-        return res.status(500).send({ error: "Internal server error" });
-    }
-
-},
-
-
 };
 export default parkingLotsController;
