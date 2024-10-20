@@ -2,6 +2,7 @@ import ParkingLotModel from "./parkingLotsModel.js";
 import redis from "../../db/redis.js";
 import { emitToSpecificSocket } from "../../socket.js";
 
+
 function isDateBetween(dateToCheck, startDate, endDate) {
   const date = new Date(dateToCheck);
   const start = new Date(startDate);
@@ -606,7 +607,57 @@ const parkingLotsController = {
       return error;
     }
   },
+  lotdataverify: async (req, res) => {
+
+    try {
+      const { ownerId,user } = req.user;
+      let email=user;
+      const { name } = req.body;
+      let lotData = await ParkingLotModel.findOne({
+        ownerId: ownerId,
+        name: name,   
+      })
+      let counts = {
+        onlineBookingLotsAndOccupied: 0,
+        iotBookingLotsAndOccupied: 0,
+        onlineBookingLotsAndNotOccupied: 0,
+        iotBookingLotsAndNotOccupied: 0,
+      };
+      if (lotData) {
+        counts.onlineBookingLotsAndOccupied = lotData.lots.filter(
+          (lot) => lot.occupied === true && lot.iotbooking === false
+        ).length;
   
+        counts.onlineBookingLotsAndNotOccupied = lotData.lots.filter(
+          (lot) => lot.occupied === false && lot.iotbooking === false
+        ).length;
+  
+        counts.iotBookingLotsAndOccupied = lotData.lots.filter(
+          (lot) => lot.occupied === true && lot.iotbooking === true
+        ).length;
+  
+        counts.iotBookingLotsAndNotOccupied = lotData.lots.filter(
+          (lot) => lot.occupied === false && lot.iotbooking === true
+        ).length;
+        console.log("a..." + counts);
+        await redis.set(ownerId, JSON.stringify(counts), "EX", 600);
+        const socketId = await redis.hget(email, "socketId");
+        if (socketId) {
+          emitToSpecificSocket(socketId, "lotData", counts);
+        }
+      }
+
+      if (!lotData) { 
+        return res.status(404).send({ error: "Parking lot not found" });
+      }
+       
+      
+
+
+    } catch (error) {
+      
+    }
+  },
 
   hadelLotDataCashe: async (req, res) => {
     console.log("aa");
@@ -674,11 +725,11 @@ const parkingLotsController = {
   makeOneLotIotBooking: async (req, res) => {
     try {
       const { ownerId } = req.user;
-      const { name, pincode } = req.body;
+      const { name,  } = req.body;
       let lotData = await ParkingLotModel.findOne({
         ownerId: ownerId,
         name: name,
-        pincode: pincode,
+       
       });
 
       if (!lotData) {
@@ -702,9 +753,9 @@ const parkingLotsController = {
           .status(400)
           .send({ error: "No available lot for onspot booking consverion" });
       }
-
+      lotData.markModified('lots');
       await lotData.save();
-
+      await parkingLotsController.lotdataverify(req, res);
       return res.status(200).send(lotData);
     } catch (error) {
       console.error("Error booking IoT lot:", error);
@@ -714,38 +765,47 @@ const parkingLotsController = {
   makeOneLotOnlineBooking: async (req, res) => {
     try {
       const { ownerId } = req.user;
-      const { name, pincode } = req.body;
-      let lotData = await ParkingLotModel.findOne({
-        ownerId: ownerId,
-        name: name,
-        pincode: pincode,
-      });
+      const { name } = req.body;
+  
+      // Find parking lot based on owner, name, and pincode
+      let lotData = await ParkingLotModel.findOne({ ownerId, name });
       if (!lotData) {
         return res.status(404).send({ error: "Parking lot not found" });
       }
+  
       let lotUpdated = false;
       for (let i = 0; i < lotData.lots.length; i++) {
-        if (
-          lotData.lots[i].occupied === false &&
-          lotData.lots[i].iotbooking === true
-        ) {
-          lotData.lots[i].iotbooking = false;
+        // Look for an available IoT-enabled lot
+        if (!lotData.lots[i].occupied && lotData.lots[i].iotbooking) {
+          lotData.lots[i].iotbooking = false; // Convert to on-spot booking
           lotUpdated = true;
           break;
         }
       }
+  
+      // If no lot was updated, return an error
       if (!lotUpdated) {
-        return res
-          .status(400)
-          .send({ error: "No available lot for onspot booking consverion" });
+        return res.status(400).send({ error: "No available lot for onspot booking conversion" });
       }
+  
+      // Mark the 'lots' array as modified
+      lotData.markModified('lots');
+      
+      // Save the updated lot data
       await lotData.save();
+      
+      // Call cache handling function if necessary
+      await parkingLotsController.lotdataverify(req, res);
       return res.status(200).send(lotData);
+      // Respond with success if needed (uncomment if response required)
+      // return res.status(200).send(lotData);
+  
     } catch (error) {
       console.error("Error booking online lot:", error);
       return res.status(500).send({ error: "Internal server error" });
     }
   },
+  
   findParkingLotbyOwnerid: async (req, res) => {
     console.log(req.user);
     console.log("bbb");
