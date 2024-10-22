@@ -2,23 +2,24 @@ import React, { useEffect, useState } from "react";
 import io from "socket.io-client";
 import BasicPie from "./piechart.jsx";
 import Cookies from "js-cookie";
-import UseNumberInputCompact from "./counter.jsx"; // Assuming you are using this component elsewhere
-
+import UseNumberInputCompact from "./counter.jsx"; 
+import { useLocation } from "react-router-dom";
 export default function BooklotPopup() {
   const [serverMessage, setServerMessage] = useState("");
-
+  const location = useLocation();
+  const { parkingLotName, pincode, model } = location.state || {};
   useEffect(() => {
     const ownerToken = Cookies.get("ownertoken");
 
     if (ownerToken) {
-      const socket = io(`http://${process.env.REACT_APP_BACKEND_IP}:${process.env.REACT_APP_BACKEND_SOCKETPORT}`); // Ensure the correct server URL
+      const socket = io(`http://${process.env.REACT_APP_BACKEND_IP}:${process.env.REACT_APP_BACKEND_SOCKETPORT}`); 
 
       socket.on("connect", () => {
-        console.log("Connected to backend, Socket ID:", socket.id);
+        console.log("Connected to backend, Socket ID:", socket.id,);
         console.log("Owner Token:", ownerToken);
 
         // Emit 'userConnected' event with ownerToken and socketId
-        socket.emit("userConnected", { ownerToken, socketId: socket.id });
+        socket.emit("userConnected", { ownerToken, socketId: socket.id, parkingLotName });
         console.log("userConnected event emitted");
       });
       socket.on("lotData", (data) => {

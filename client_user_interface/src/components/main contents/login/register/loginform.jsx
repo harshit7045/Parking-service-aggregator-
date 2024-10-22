@@ -29,7 +29,9 @@ async function loginUser() {
       alert({ show: false, message: data.message, severity: "error" });
     }
     console.log(data.token);
-    Cookies.set("token", data.token, { expires: 7 });
+    if(data.token){
+      Cookies.set("token", data.token, { expires: 7 });
+    }
   } catch (error) {
     console.log(error);
   }

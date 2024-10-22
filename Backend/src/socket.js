@@ -16,10 +16,10 @@ io.on('connection', (socket) => {
     console.log('Socket connected', socket.id);
     
     
-    socket.on('userConnected', async ({ ownerToken, socketId }) => {
+    socket.on('userConnected', async ({ ownerToken, socketId, parkingLotName }) => {
         
-        console.log(`User connected with ownerToken: ${ownerToken}, socketId: ${socketId}`);
-        let lotData= await socketRegister(socketId, ownerToken);
+        console.log(`User connected with ownerToken: ${ownerToken}, socketId: ${socketId}, parkingLotName: ${parkingLotName}`);
+        let lotData= await socketRegister(socketId, ownerToken,parkingLotName);
         socket.emit('lotData', lotData);
     });
 

@@ -116,7 +116,7 @@ const RegistrationForm = () => {
   };
 
   return (
-    <div className="p-4 max-w-md min-h-[50vh] mx-auto mb-[-5vh] sm:max-w-lg sm:mx-auto sm:p-8 lg:max-w-full lg:mx-0 lg:p-8">
+    <div className="p-4 max-w-md min-h-[60vh] mx-auto mb-[-5vh] sm:max-w-lg sm:mx-auto sm:p-8 lg:max-w-full lg:mx-0 lg:p-8">
       <form className="lg:w-full lg:flex lg:flex-col lg:items-center">
         <div className="mb-4 w-full">
           <label className="block text-gray-700">Email</label>
@@ -166,8 +166,7 @@ const RegistrationForm = () => {
           >
             <option value="0">Select Number of Parking Lots</option>
             <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
+           
           </select>
           {errors.vehicles && (
             <p className="text-red-500 text-sm mt-1">{errors.vehicles}</p>

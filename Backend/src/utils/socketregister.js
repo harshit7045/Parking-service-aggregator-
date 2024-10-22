@@ -3,7 +3,7 @@ import redis from "../db/redis.js";
 import parkingLotsController from "../features/parking_lots/prakinglotscontroller.js";
 const { verify } = pkg;
 
-async function socketRegister(socketId, token) {
+async function socketRegister(socketId, token,parkingLotName) {
   if (!token) {
     console.log("No token provided");
     return { error: "No token provided" };
@@ -29,7 +29,7 @@ async function socketRegister(socketId, token) {
         const req = {
           user: decoded,
           body: {
-            name: "Parking Lot A"
+            name: parkingLotName
           }
         };
         const res = {};

@@ -17,7 +17,6 @@ import CarImgMediaCard from "./booklotVehiclecard";
 import Cookies from "js-cookie";
 import { BasicDatePicker, hoursdate } from "./singledatePicker";
 import { useLocation } from "react-router-dom";
-import SimpleAlert from "../homepage/alertbox";
 import img from "../../../assets/images/background.png";
 const textStyle =
   "text-[#030303] text-[30px] font-bold font-[Poppins] text-left py-[2vh] px-[2vw] relative z-[1] flex justify-center ";
@@ -52,12 +51,12 @@ const textStyle =
       <div className={textStyle}>Your Vehicles</div>
       <div className="flex-row flex flex-wrap justify-center lg:p-[5rem]">
         {vehicles.map((vehicle) => (
-          <div className="m-[5vw]">
+          <div className="m-[5vw] w-[30vw] ">
             <CarImgMediaCard
               key={vehicle.uniqueIdentification}
               title={vehicle.uniqueIdentification}
               description={vehicle.category}
-              image="https://plus.unsplash.com/premium_photo-1661956487605-1544bcd9b29e?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8Y2FyJTIwaW4lMjBwYXJraW5nfGVufDB8fDB8fHww"
+              image="https://www.freeiconspng.com/uploads/land-rover-range-rover-car-png-25.png"
               data={dat} 
             />
           </div>

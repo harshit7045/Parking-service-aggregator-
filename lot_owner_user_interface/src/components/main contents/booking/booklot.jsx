@@ -54,18 +54,18 @@ const targetRef=useRef(null);
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Perform navigation when the component mounts
+    
     navigate("/booklot");
   }, [navigate]);
 
   useEffect(() => {
-    // Log the model whenever it changes
+    
     console.log(model);
   }, [model]);
   useEffect(() => {
-    const token = Cookies.get('ownertoken'); // Check if token exists
+    const token = Cookies.get('ownertoken'); 
     if (!token) {
-      navigate('/login'); // Redirect to login if no token
+      navigate('/login'); 
     }
   }, [navigate]);
   const handleSearch = async () => {
