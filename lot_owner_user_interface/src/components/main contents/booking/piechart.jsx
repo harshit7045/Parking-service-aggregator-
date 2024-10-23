@@ -2,7 +2,7 @@ import * as React from 'react';
 import { PieChart } from '@mui/x-charts/PieChart';
 
 export default function BasicPie({ serverMessage }) {
-  console.log(serverMessage);
+  //console.log(serverMessage);
 
   const data = [
     { id: 0, value: serverMessage.onlineBookingLotsAndOccupied, label: 'online lots and occupied' },
@@ -21,7 +21,7 @@ export default function BasicPie({ serverMessage }) {
           },
         ]}
         legend={{ hidden: true }}
-       sx={{ width: '100%', height: '100%' }}
+       sx={{ width: '100%', height: '100%',marginLeft: '10%' }}
       />
    </> 
   );

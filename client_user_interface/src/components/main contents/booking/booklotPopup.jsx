@@ -102,12 +102,12 @@ export default function Bookingform() {
 
   const handleOkayClick = () => {
     setDialogOpen(true);
-    console.log("Booking Details:");
-    console.log(dat.bookingModel);
+   // console.log("Booking Details:");
+    //console.log(dat.bookingModel);
     if (targetRef.current) {
       targetRef.current.scrollIntoView({ behavior: "smooth" });
     } else {
-      console.log("Target element not found");
+      //console.log("Target element not found");
     }
   };
 
@@ -289,7 +289,7 @@ async function getUserProfile() {
     const vehicleData = await responseVehicles.json();
     user.vehicle = vehicleData;
   } catch (error) {
-    console.log("Error fetching vehicles:", error);
+    //console.log("Error fetching vehicles:", error);
     return null;
   }
 
@@ -312,7 +312,7 @@ async function getUserProfile() {
     const userData = await responseUser.json();
     user.userDetails = userData.user;
   } catch (error) {
-    console.log("Error fetching user profile:", error);
+    //console.log("Error fetching user profile:", error);
     return null;
   }
 

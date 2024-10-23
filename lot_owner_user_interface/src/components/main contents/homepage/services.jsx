@@ -3,7 +3,7 @@ import x from "../../../assets/images/wOMEN_IN_CAR.jpg"; // Ensure the correct p
 
 const WhyChoose = () => {
   return (
-    <div className="min-h-[115vh] max-w-[100vw] bg-white flex flex-col">
+    <div className="min-h-[110vh] max-w-[100vw] mt-[5vh] mb-[5vh] bg-white flex flex-col">
       {/* Image and Text Section */}
       <div className="flex flex-col lg:flex-row">
         <div className="flex justify-center w-full lg:w-auto lg:ml-[10vw] lg:mt-[15vh] rounded-xl overflow-hidden">
@@ -13,7 +13,7 @@ const WhyChoose = () => {
           <div className="text-[#21303E] text-[35px] font-bold mb-2">
             Why Register Your Parking Lot with <br /> ParkEase?
           </div>
-          <div className="text-gray-500 text-[16px] font-normal mt-[1vh] lg:mt-[3vh]">
+          <div className="text-gray-500 text-[16px] w-[80%] font-normal mt-[1vh] lg:mt-[3vh]">
             Join ParkEase to maximize your parking lot’s potential! Registering with us means you can offer seamless online bookings, including flexible date-wise and hour-wise options.
           </div>
         </div>

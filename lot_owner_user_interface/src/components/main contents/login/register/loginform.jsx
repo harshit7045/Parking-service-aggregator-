@@ -11,7 +11,7 @@ const alertBarStyle = {
 async function loginUser() {
   const email = document.getElementById("email").value;
   const password = document.getElementById("password").value;
-  console.log(email, password);
+  //console.log(email, password);
   try {
     const response = await fetch(`http://${process.env.REACT_APP_BACKEND_IP}:${process.env.REACT_APP_BACKEND_PORT}/api/parkinglotowner/login`, {
       method: "POST",
@@ -20,21 +20,21 @@ async function loginUser() {
       },
       body: JSON.stringify({ email, password }),
     });
-    console.log(process.env.BACKENDIP);
+    //console.log(process.env.BACKENDIP);
     const data = await response.json();
-    console.log("Document Cookies:", response.cookie);
+    //console.log("Document Cookies:", response.cookie);
     if (data.token) {
       loginNagivate();
     } else {
       alert({ show: false, message: data.message, severity: "error" });
     }
-    console.log(data.token);
+    //console.log(data.token);
 
     if(data.token){
       Cookies.set("ownertoken", data.token, { expires: 7 });
     }
   } catch (error) {
-    console.log(error);
+    //console.log(error);
   }
 }
 let loginNagivate;

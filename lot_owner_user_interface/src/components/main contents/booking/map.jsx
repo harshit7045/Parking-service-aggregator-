@@ -19,14 +19,14 @@ const MapWithSearch = ({ initialLocation }) => {
         Cookies.set('mapToken', publicToken, { expires: 7 });
         setMapToken(publicToken);
       }
-
+      
       // Ensure mapToken is available before initializing the map
       if (mapToken) {
         mapboxgl.accessToken = mapToken;
 
         mapInstanceRef.current = new mapboxgl.Map({
           container: mapContainerRef.current,
-          center: initialLocation || [-74.5, 40],
+          center: initialLocation || [31.5,76.1],
           zoom: 9,
         });
 

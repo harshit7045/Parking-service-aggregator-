@@ -44,7 +44,7 @@ function BasicDatePicker() {
 
             // Manually format the date as YYYY-MM-DDTHH:mm:ss.sssZ but in IST
             hoursdate = dateInTimezone.format('YYYY-MM-DDTHH:mm:ss.SSS[Z]');
-            console.log(hoursdate); // Log the date in IST timezone in ISO-like format
+            //console.log(hoursdate); // Log the date in IST timezone in ISO-like format
           }}
         />
       </DemoContainer>

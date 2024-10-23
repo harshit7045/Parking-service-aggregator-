@@ -67,7 +67,7 @@ async function getUserProfile() {
     return null;
   }
 
-  console.log(user.userDetails);
+  //console.log(user.userDetails);
   return user;
 }
 
@@ -195,7 +195,7 @@ const UserProfile = () => {
   useEffect(() => {
     async function fetchData() {
       const userProfile = await getUserProfile();
-      console.log("Fetched profile:", userProfile);
+      //console.log("Fetched profile:", userProfile);
       if (userProfile) {
         setProfile(userProfile.userDetails);
         setVehicles(userProfile.vehicle || []);

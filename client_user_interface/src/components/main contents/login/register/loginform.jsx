@@ -20,20 +20,20 @@ async function loginUser() {
       },
       body: JSON.stringify({ email, password }),
     });
-    console.log(process.env.BACKENDIP);
+    //console.log(process.env.BACKENDIP);
     const data = await response.json();
-    console.log("Document Cookies:", response.cookie);
+    //console.log("Document Cookies:", response.cookie);
     if (data.token) {
       loginNagivate();
     } else {
       alert({ show: false, message: data.message, severity: "error" });
     }
-    console.log(data.token);
+    //console.log(data.token);
     if(data.token){
       Cookies.set("token", data.token, { expires: 7 });
     }
   } catch (error) {
-    console.log(error);
+    //console.log(error);
   }
 }
 let loginNagivate;

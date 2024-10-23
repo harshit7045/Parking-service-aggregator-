@@ -105,13 +105,13 @@ const RegistrationForm = () => {
       });
       if (response.ok) {
         const data = await response.json();
-        console.log("Registration successful:", data);
+        //console.log("Registration successful:", data);
         handelRegister();
       } else {
-        console.error("Registration failed:", response.statusText);
+        //console.error("Registration failed:", response.statusText);
       }
     } catch (error) {
-      console.error("Error:", error);
+      //console.error("Error:", error);
     }
   };
 

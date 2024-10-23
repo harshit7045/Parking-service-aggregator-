@@ -47,7 +47,7 @@ export default function Header() {
     }, []);
 
     return (
-        <header className="relative min-h-[8vh] w-full shadow-xl px-4 bg-[#15202a] md:px-8 flex items-center justify-between">
+        <header className="relative min-h-[8vh] w-full shadow-xl px-4    bg-[#15202a] md:px-8 flex items-center justify-between">
             <div
                 onClick={homepage}
                 className="text-[#ffffff] font-poppins text-[40px] font-bold cursor-pointer"

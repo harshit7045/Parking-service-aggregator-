@@ -61,7 +61,7 @@ const targetRef=useRef(null);
 
   useEffect(() => {
     // Log the model whenever it changes
-    console.log(model);
+   // console.log(model);
   }, [model]);
   useEffect(() => {
     const token = Cookies.get('token'); // Check if token exists
@@ -94,7 +94,7 @@ const targetRef=useRef(null);
       if (data.length === 0) {
         setAlertData({
           show: true,
-          message: "No Parking Lots Found, please try another pin code.",
+          message: "No Parking Lots Found, please try another pin code. For demostration You can use pincode 228001",
           severity: "error",
         });
       } else {

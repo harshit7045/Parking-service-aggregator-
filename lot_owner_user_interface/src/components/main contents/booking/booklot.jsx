@@ -37,10 +37,12 @@ const getLatlong = async (pincode) => {
 };
 
 function ParkingLot() {
+
   const [parkingLots, setParkingLots] = useState([]);
   const [model, setModel] = useState("hours");
   const [pincode, setPincode] = useState("");
   const [searchPincode, setSearchPincode] = useState(null);
+  
   const [alertData, setAlertData] = useState({
     show: false,
     message: "",
@@ -60,7 +62,7 @@ const targetRef=useRef(null);
 
   useEffect(() => {
     
-    console.log(model);
+    //console.log(model);
   }, [model]);
   useEffect(() => {
     const token = Cookies.get('ownertoken'); 
@@ -129,7 +131,10 @@ const targetRef=useRef(null);
   };
 
   useEffect(() => {
+    
+    
     handleSearch();
+    
   }, []);
 
 
@@ -163,7 +168,7 @@ const targetRef=useRef(null);
                   className="mt-4 w-full bg-green-500 text-white hover:bg-green-600 py-2 rounded"
                   onClick={() => handleBookNow(lot)}
                 >
-                  Book Now
+                  Manage Lot
                 </button>
               </div>
             ))}

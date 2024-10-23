@@ -61,7 +61,7 @@ export default function CarImgMediaCard({ title, description, image, data }) {
   };
 
   async function booking(data) {
-    console.log("Booking Data:", data); 
+    //console.log("Booking Data:", data); 
     let message;
     try {
       const response = await fetch(`http://${process.env.REACT_APP_BACKEND_IP}:${process.env.REACT_APP_BACKEND_PORT}/api/bookings/book`, {
@@ -79,7 +79,7 @@ export default function CarImgMediaCard({ title, description, image, data }) {
       }
 
       const responseData = await response.json();
-      console.log("Booking successful:", responseData);
+      //console.log("Booking successful:", responseData);
       
      
       setAlertData({
@@ -88,8 +88,8 @@ export default function CarImgMediaCard({ title, description, image, data }) {
         severity: "success", 
       });
     } catch (error) {
-      console.log('Error booking:', error);
-      console.log(message);
+      //console.log('Error booking:', error);
+      //console.log(message);
       const outputMessage = message?.message || "Please select the date and time properly";
       setAlertData({
         show: true,

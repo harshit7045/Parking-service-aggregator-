@@ -79,7 +79,7 @@ export default function ImgMedia({ title, description, image }) {
       </CardContent>
       <CardActions>
         <Button size="small" sx={buttonStyle} onClick={handleBookNow}>
-          Book
+          Manage Lot
         </Button>
       </CardActions>
     </Card>

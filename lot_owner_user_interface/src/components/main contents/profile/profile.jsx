@@ -57,7 +57,7 @@ async function getUserProfile() {
     if (!responseUser.ok) {
       throw new Error(`HTTP error! status: ${responseUser.status}`);
     }
-    console.log( "aaa"+responseUser);
+    //console.log( "aaa"+responseUser);
     const userData = await responseUser.json();
 
     user.userDetails = userData.user;
@@ -66,13 +66,13 @@ async function getUserProfile() {
     return null;
   }
 
-  console.log(user.userDetails);
+  //console.log(user.userDetails);
   return user;
 }
 
 let balance = 0;
 const ProfileCard = ({ profile }) => (
-  <div className="flex flex-col items-center p-6 sm:p-8 mx-auto w-full max-w-lg rounded-lg shadow-md mt-[-7vh]">
+  <div className="flex flex-col items-center  p-6 sm:p-8 mx-auto w-full max-w-lg rounded-lg shadow-md mt-[-7vh]">
     {/* Profile Image */}
     <img
       src="https://th.bing.com/th/id/OIP.bTaXpIA91aRjknCY9tPfAgHaHa?w=202&h=202&c=7&r=0&o=5&pid=1.7" // Replace with your image link
@@ -81,7 +81,7 @@ const ProfileCard = ({ profile }) => (
     />
 
     {/* Title */}
-    <div className="text-xl font-bold mb-6">Profile Details {profile.name}</div>
+    <div className="text-xl font-bold mb-6">Profile Details of {profile.name}</div>
 
     {/* User Information Table */}
     <div className="w-full">
@@ -96,9 +96,9 @@ const ProfileCard = ({ profile }) => (
             <td className="px-4 py-2 text-gray-600">{profile.email}</td>
           </tr>
           <tr className="border-b border-gray-200">
-            <td className="px-4 py-2 text-xl font-bold text-gray-700">Wallet Balance</td>
+            <td className="px-4 py-2 text-xl font-bold text-gray-700">Owner Name</td>
             <td className="px-4 py-2 text-gray-600">
-              ${profile.name }
+              {profile.name }
             </td>
           </tr>
         </tbody>
@@ -150,7 +150,7 @@ const UserProfile = () => {
   useEffect(() => {
     async function fetchData() {
       const userProfile = await getUserProfile();
-      console.log("Fetched profile:", userProfile);
+      //console.log("Fetched profile:", userProfile);
       if (userProfile) {
         setProfile(userProfile.userDetails);
         setVehicles(userProfile.vehicle || []);

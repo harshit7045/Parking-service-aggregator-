@@ -34,7 +34,7 @@ function EndStaticTimePickerLandscape() {
         orientation={orientation}
         onChange={(value) => {
           endTime = value.$d.toTimeString();
-          console.log(value.$d);
+          //console.log(value.$d);
         }}
       />
     </LocalizationProvider>

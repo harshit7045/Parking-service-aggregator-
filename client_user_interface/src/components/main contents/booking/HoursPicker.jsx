@@ -34,7 +34,7 @@ function StaticTimePickerLandscape() {
         sx={{ borderRadius: '20px' }}
         onChange={(value) => {
           startTime = value.$d.toTimeString();
-          console.log(value.$d);
+          //console.log(value.$d);
         }}
         orientation={orientation} // Dynamically set orientation
       />

@@ -105,7 +105,7 @@ const RegistrationForm = () => {
       });
       if (response.ok) {
         const data = await response.json();
-        console.log("Registration successful:", data);
+        //console.log("Registration successful:", data);
         handelRegister();
       } else {
         console.error("Registration failed:", response.statusText);
@@ -116,7 +116,7 @@ const RegistrationForm = () => {
   };
 
   return (
-    <div className="p-4 max-w-md min-h-[60vh] mx-auto mb-[-5vh] sm:max-w-lg sm:mx-auto sm:p-8 lg:max-w-full lg:mx-0 lg:p-8">
+    <div className="p-4 max-w-md min-h-[70vh] mx-auto mb-[-5vh] sm:max-w-lg sm:mx-auto sm:p-8 lg:max-w-full lg:mx-0 lg:p-8">
       <form className="lg:w-full lg:flex lg:flex-col lg:items-center">
         <div className="mb-4 w-full">
           <label className="block text-gray-700">Email</label>

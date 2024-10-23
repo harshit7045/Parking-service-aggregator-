@@ -61,7 +61,7 @@ export default function CarImgMediaCard({ title, description, image, data }) {
   };
 
   async function booking(data) {
-    console.log("Booking Data:", data); 
+    //console.log("Booking Data:", data); 
     let message;
     try {
       const response = await fetch(`http://${process.env.REACT_APP_BACKEND_IP}:${process.env.REACT_APP_BACKEND_PORT}/api/bookings/book`, {

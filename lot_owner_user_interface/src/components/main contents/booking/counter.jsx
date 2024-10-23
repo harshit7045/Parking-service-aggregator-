@@ -17,7 +17,7 @@ const CompactNumberInput = React.forwardRef(  function CompactNumberInput(props,
   const inputProps = getInputProps();
 
   inputProps.ref = useForkRef(inputProps.ref, ref);
-  console.log("object" + object);
+  //console.log("object" + object);
   return (
     <StyledInputRoot {...getRootProps()}>
       <StyledStepperButton className="increment" {...getIncrementButtonProps()}>
@@ -37,7 +37,7 @@ export default  function UseNumberInputCompact( { lotno,name,object,serverMessag
   const [name1, setName] = React.useState(null);
   const [object1, setObject] = React.useState(null);
   const [serverMessage1, setServerMessage] = React.useState(null);
-  console.log(lotno,name,object);
+  //console.log(lotno,name,object);
   React.useEffect(() => {
     setValue(lotno);
     setName(name);
@@ -120,7 +120,7 @@ const StyledStepperButton = styled('button')(
   flex-flow: nowrap;
   justify-content: center;
   align-items: center;
-  font-size: 0.875rem;
+  font-size: 0.75rem;
   box-sizing: border-box;
   border: 0;
   padding: 0;
@@ -152,18 +152,18 @@ const Layout = styled('div')`
   display: flex;
   flex-flow: row nowrap;
   align-items: center;
-  column-gap: 1rem;
+  column-gap: 0.5rem;
 `;
 
 const Pre = styled('pre')`
   font-size: 0.75rem;
 `;
 async function callIncreaseOnline(name,serverMessage,value) { 
-                       console.log(serverMessage)  
+                       //console.log(serverMessage)  
                        
   
-  console.log(name);
-  console.log("call increase");
+  //console.log(name);
+  //console.log("call increase");
   const response =await fetch(`http://${process.env.REACT_APP_BACKEND_IP}:${process.env.REACT_APP_BACKEND_PORT}/api/parking/increaseonlinelot`, { 
     method: 'PATCH',
     body: JSON.stringify({ name : name}),
@@ -173,12 +173,12 @@ async function callIncreaseOnline(name,serverMessage,value) {
     } 
     });
     const data = await response.json();
-    console.log(data);
+    //console.log(data);
 
 }
 async function callIncreaseiot(name) { 
-  console.log(name);
-  console.log("call increase");
+  //console.log(name);
+  //console.log("call increase");
   const response =await fetch(`http://${process.env.REACT_APP_BACKEND_IP}:${process.env.REACT_APP_BACKEND_PORT}/api/parking/increaseiotlot`, { 
     method: 'PATCH',
     body: JSON.stringify({ name : name}),
@@ -188,6 +188,6 @@ async function callIncreaseiot(name) {
     } 
     });
     const data = await response.json();
-    console.log(data);
+    //console.log(data);
 
 }

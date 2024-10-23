@@ -27,7 +27,7 @@ const CheckoutForm = () => {
     })
       .then((res) => res.json())
       .then((data) => {
-        console.log("Client Secret:", data.clientSecret); // Debugging line
+        //console.log("Client Secret:", data.clientSecret); // Debugging line
         return data.clientSecret;
       });
   }, [amount]);
@@ -50,7 +50,7 @@ const Return = () => {
 
   useEffect(() => {
     const fetchSessionStatus = async () => {
-      console.log("Fetching session status..."); // Debugging line
+      //console.log("Fetching session status..."); // Debugging line
       const queryString = window.location.search;
       const urlParams = new URLSearchParams(queryString);
       const sessionId = urlParams.get("session_id");
@@ -61,7 +61,7 @@ const Return = () => {
         );
         const data = await response.json();
 
-        console.log("Session data:", data); // Debugging line
+       // console.log("Session data:", data); // Debugging line
 
         setStatus(data.status);
         setCustomerEmail(data.customer_email);
