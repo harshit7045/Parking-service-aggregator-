@@ -1,0 +1,110 @@
+#include <ESP8266WiFi.h>
+#include <ESP8266HTTPClient.h>
+#include <ArduinoJson.h>
+#include <SPI.h>
+#include <MFRC522.h>
+#include <Servo.h>
+
+#define SERVO_PIN D0
+#define SS_PIN D4
+#define RST_PIN D3
+#define LED_PIN D1
+
+Servo servo;
+MFRC522 mfrc522(SS_PIN, RST_PIN);  // RFID instance
+
+// Wi-Fi credentials
+const char* ssid = "33";
+const char* password = "12345678";
+const char* serverAddress = " 3.109.255.75";  // Server IP
+const int serverPort = 8000;
+
+WiFiClient client;
+
+void setup() {
+  Serial.begin(9600);
+  servo.attach(SERVO_PIN);
+
+  // Connect to Wi-Fi
+  Serial.println("Connecting to Wi-Fi...");
+  WiFi.begin(ssid, password);
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+  Serial.println("\nWiFi connected");
+  Serial.print("IP address: ");
+  Serial.println(WiFi.localIP());
+
+  // Initialize RFID module
+  SPI.begin();
+  mfrc522.PCD_Init();
+
+  pinMode(LED_PIN, OUTPUT);
+
+  // Reset servo position
+  servo.write(0);
+}
+
+void sendToServer(String message, int pincode) {
+  if (WiFi.status() == WL_CONNECTED) {
+    HTTPClient http;
+
+    // Construct URL
+    String url = "http://" + String(serverAddress) + ":" + String(serverPort) + "/api/iot/book";
+    Serial.println("Sending POST request to: " + url);
+
+    http.begin(client, url);
+    http.addHeader("Content-Type", "application/json");
+
+    // Create JSON payload
+    StaticJsonDocument<128> jsonDocument;
+    jsonDocument["message"] = message;
+    jsonDocument["pincode"] = pincode;
+    jsonDocument["name"] = "Parking Lot A";
+
+    String jsonString;
+    serializeJson(jsonDocument, jsonString);
+    Serial.println("Payload: " + jsonString);
+
+    // Send POST request
+    int httpResponseCode = http.POST(jsonString);
+
+    if (httpResponseCode > 0) {
+      Serial.print("HTTP Response code: ");
+      Serial.println(httpResponseCode);
+      String payload = http.getString();
+      Serial.println("Response: " + payload);
+    } else {
+      Serial.print("HTTP POST failed, error: ");
+      Serial.println(http.errorToString(httpResponseCode));
+    }
+
+    http.end();
+  } else {
+    Serial.println("WiFi not connected");
+  }
+}
+
+void loop() {
+  // Check for new RFID card
+  if (mfrc522.PICC_IsNewCardPresent() && mfrc522.PICC_ReadCardSerial()) {
+    String readUID = "";
+    for (byte i = 0; i < mfrc522.uid.size; i++) {
+      readUID += String(mfrc522.uid.uidByte[i], HEX);
+    }
+    readUID.toUpperCase();
+    Serial.println("Card UID: " + readUID);
+
+    // Perform action
+    digitalWrite(LED_PIN, HIGH);
+    sendToServer(readUID, 228001);  // Send data to server
+    servo.write(180);  // Open servo
+    delay(1000);
+    digitalWrite(LED_PIN, LOW);
+    servo.write(0);  // Close servo
+    delay(1000);
+
+    mfrc522.PICC_HaltA();  // Halt RFID card
+  }
+}
